@@ -32,5 +32,16 @@ public class LoginCheckFilter implements Filter {
             // (간단하게 리다이렉트만 구현하거나, 자바스크립트를 응답에 써줄 수 있습니다.)
             res.sendRedirect(req.getContextPath() + "/login.jsp?error=auth");
         }
+        
+        // LoginCheckFilter.java 의 doFilter 내부 로직 수정
+        String uri = req.getRequestURI();
+
+        // 로그인 페이지, 로그인 서블릿은 물론 '회원가입' 관련 경로도 무사통과 시켜줍니다.
+        if (uri.contains("login.jsp") || uri.contains("LoginServlet") || 
+            uri.contains("join.jsp") || uri.contains("JoinServlet")) {
+            
+            chain.doFilter(request, response);
+            return;
+        }
     }
 }

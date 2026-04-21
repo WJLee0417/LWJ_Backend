@@ -134,6 +134,10 @@
             </div>
 
             <button type="submit" class="login-btn">로그인</button>
+            
+            <div style="text-align: center; margin-top: 15px;">
+    			<a href="join.jsp" style="color: #8d6e63; text-decoration: none; font-size: 0.9em; font-weight: bold; border-bottom: 1px dashed #8d6e63;">아직 회원이 아니신가요? 회원가입</a>
+			</div>
         </form>
     </div>
 
