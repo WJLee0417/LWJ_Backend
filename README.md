@@ -1,6 +1,6 @@
 # 🚀 BackendMaster (Study Group Board)
 
-**Servlet, JSP, Filter, Session & Cookie**를 총망라한 MVC 기반 통합 웹 프로젝트입니다. 5명의 스터디원이 각각의 백엔드 주제를 정리하고 공유하는 **'감성 스터디 게시판'** 컨셉으로 제작되었으며, 카테고리 필터링과 신규 스터디원의 회원가입 기능까지 완벽하게 지원합니다.
+**Servlet, JSP, Filter, Session & Cookie**를 총망라한 MVC 기반 통합 웹 프로젝트입니다. 5명의 스터디원이 각각의 백엔드 주제를 정리하고 공유하는 **'감성 스터디 게시판'** 컨셉으로 제작되었으며, 카테고리 필터링, 회원가입, 그리고 **게시글별 댓글 시스템**까지 완벽하게 지원합니다.
 
 ---
 
@@ -15,7 +15,7 @@
 
 ## 👥 스터디 그룹 및 테스트 계정
 
-프로젝트의 모든 기능을 직접 테스트해 볼 수 있는 초기 계정 정보입니다. **(신규 회원가입 테스트도 가능합니다!)**
+프로젝트의 모든 기능을 직접 테스트해 볼 수 있는 초기 계정 정보입니다. **(신규 회원가입 및 댓글 작성 테스트도 가능합니다!)**
 
 | 역할 | ID | PW | 닉네임 | 담당 학습 주제 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -30,21 +30,54 @@
 
 ## 🌟 주요 기능 (Key Features)
 
-### 1. 고도화된 게시판 로직 (Advanced Board)
-- **카테고리 필터링**: `전체`, `공지사항`, `학습기록`, `자유게시판` 탭을 제공하여 관심 있는 주제의 글만 모아볼 수 있습니다.
-- **공지사항 상단 고정 (Pinned)**: 어느 카테고리 탭을 선택하더라도 '공지' 게시물은 항상 최상단에 하이라이트(📌)되어 노출됩니다.
-- **정교한 가상 번호 시스템**: 최상단에 고정된 공지사항을 제외하고, 일반 게시글의 개수만을 정확히 카운트하여 역순으로 가상 번호를 매기는 렌더링 로직을 구현했습니다.
-- **PRG 패턴 (Post-Redirect-Get)**: 글 작성/삭제 및 회원가입 후 리다이렉트 처리를 통해 브라우저 새로고침 시 발생하는 중복 요청을 방지합니다.
+### 1. 지능형 댓글 시스템 (Smart Comment System)
+- **1:N 데이터 매핑**: `MockDB` 내에서 게시글 ID(`boardId`)를 기준으로 해당 글에 달린 댓글들만 실시간으로 필터링하여 출력합니다.
+- **세션 기반 작성**: 댓글 작성 시 별도의 입력 없이 세션에 저장된 로그인 유저의 정보를 자동으로 할당하여 데이터 무결성을 보장합니다.
+- **상세보기 통합**: 별도의 페이지 이동 없이 게시글 하단에서 댓글 목록 확인과 작성이 동시에 가능하도록 UI를 설계했습니다.
 
-### 2. 사용자 인증 및 보안 (Security & Auth)
-- **보안 필터 (LoginCheckFilter)**: 미인증 유저의 게시판 접근을 전역적으로 차단하되, 로그인과 회원가입 로직은 예외 처리하여 유연한 보안망을 구축했습니다.
-- **작성자 기반 권한**: 본인이 작성한 글만 삭제할 수 있으며, 서버 측에서 이중 검증합니다. (관리자 `admin`은 전체 삭제 가능)
-- **상태 유지**: `Session`을 통한 로그인 상태 유지 및 `Cookie`를 활용한 '아이디 저장' 기능을 제공합니다.
-- **아이디 중복 검사**: 회원가입 시 `MockDB`를 조회하여 중복된 아이디 가입을 방지합니다.
+### 2. 고도화된 게시판 로직 (Advanced Board)
+- **카테고리 필터링**: `전체`, `공지사항`, `학습기록`, `자유게시판` 탭을 통해 관심 주제별로 글을 모아볼 수 있습니다.
+- **공지사항 상단 고정 (Pinned)**: 어떤 카테고리를 선택하든 '공지' 글은 항상 최상단에 하이라이트(📌) 노출됩니다.
+- **정교한 가상 번호**: 고정된 공지사항을 제외한 일반 게시글만 역순으로 순차 번호를 부여하는 렌더링 로직을 적용했습니다.
 
-### 3. 모니터링 및 성능 (Performance)
-- **PerformanceFilter**: 모든 HTTP 요청의 처리 속도를 밀리초(ms) 단위로 측정하여 서버 콘솔에 기록합니다.
-- **EncodingFilter**: 전역 UTF-8 필터 설정을 통해 한글 깨짐 문제를 일괄적으로 해결했습니다.
+### 3. 사용자 인증 및 보안 (Security & Auth)
+- **보안 필터 (LoginCheckFilter)**: 미인증 유저의 접근을 전역 차단하며, 로그인/회원가입 로직은 예외 처리하여 보안성과 편의성을 동시에 잡았습니다.
+- **권한 기반 제어**: 본인이 작성한 글/댓글에 대해서만 관리 권한을 부여하며, 서버 측에서 이중 검증을 수행합니다.
+
+---
+
+## 📂 프로젝트 아키텍처 (Architecture)
+
+MVC 패턴과 1:N 관계형 데이터 구조를 반영한 최종 디렉토리 구조입니다.
+
+```text
+BackendMaster
+├── src/main/java
+│   ├── com.test.db
+│   │   └── MockDB.java            # Model: 회원/게시글/댓글 가상 테이블 초기화
+│   ├── com.test.dto
+│   │   ├── Member.java            # Model: 회원 정보 DTO
+│   │   ├── Board.java             # Model: 게시글 정보 DTO (Category 포함)
+│   │   └── Comment.java           # Model: 댓글 정보 DTO (boardId 외래키 포함)
+│   ├── com.test.filter
+│   │   ├── EncodingFilter.java    # Filter: 전역 UTF-8 인코딩
+│   │   ├── PerformanceFilter.java # Filter: 응답 시간 측정 및 로깅
+│   │   └── LoginCheckFilter.java  # Filter: 미인증 유저 접근 제어
+│   └── com.test.servlet
+│       ├── JoinServlet.java       # Controller: 회원가입 처리
+│       ├── LoginServlet.java      # Controller: 로그인 및 쿠키/세션 생성
+│       ├── BoardListServlet.java  # Controller: 카테고리 필터링 및 고정 로직
+│       ├── BoardDetailServlet.java# Controller: 게시글 상세 + 해당 댓글 필터링 추출
+│       └── CommentWriteServlet.java# Controller: 댓글 저장 및 PRG 패턴 적용
+│
+├── src/main/webapp
+│   ├── index.html                 # View: 프로젝트 가이드 대시보드
+│   ├── join.jsp                   # View: 신규 회원가입 폼
+│   ├── board.jsp                  # View: 탭 기반 목록 및 공지사항 하이라이트
+│   └── boardDetail.jsp            # View: 상세 보기 + 댓글 목록 및 작성 폼
+│
+└── pom.xml                        # Maven 의존성 관리
+```
 
 ---
 
@@ -58,42 +91,6 @@
 - **Build Tool**: Maven
 
 ---
-
-## 📂 프로젝트 아키텍처 (Architecture)
-
-MVC 패턴을 준수하며, 공통 관심사를 Filter 레이어에서 처리하는 실무 지향적 구조입니다.
-
-```text
-BackendMaster
-├── src/main/java
-│   ├── com.test.db
-│   │   └── MockDB.java            # Model: 가상 DB (카테고리별 더미 데이터 초기화)
-│   ├── com.test.dto
-│   │   ├── Member.java            # Model: 회원 정보
-│   │   └── Board.java             # Model: 게시글 정보 (Category 필드 포함)
-│   ├── com.test.filter
-│   │   ├── EncodingFilter.java    # Filter: 전역 UTF-8 인코딩
-│   │   ├── PerformanceFilter.java # Filter: 응답 시간 측정 및 로깅
-│   │   └── LoginCheckFilter.java  # Filter: 미인증 유저 게시판 차단
-│   └── com.test.servlet
-│       ├── JoinServlet.java       # Controller: 회원가입 및 ID 중복 검사
-│       ├── LoginServlet.java      # Controller: 로그인 처리 및 쿠키/세션 생성
-│       ├── LogoutServlet.java     # Controller: 로그아웃 및 세션 파기
-│       ├── BoardListServlet.java  # Controller: 카테고리 필터링 및 공지사항 정렬
-│       ├── BoardWriteServlet.java # Controller: 새 글 및 카테고리 작성
-│       ├── BoardDetailServlet.java# Controller: 글 상세 조회
-│       └── BoardDeleteServlet.java# Controller: 게시글 삭제 처리
-│
-├── src/main/webapp
-│   ├── index.html                 # View: 프로젝트 통합 대시보드 및 가이드
-│   ├── join.jsp                   # View: 신규 회원가입 폼
-│   ├── login.jsp                  # View: 로그인 폼
-│   ├── board.jsp                  # View: 탭 기반 카테고리 목록 및 JSTL 동적 렌더링
-│   ├── boardWrite.jsp             # View: 새 글 작성 폼 (권한별 카테고리 select)
-│   └── boardDetail.jsp            # View: 게시글 상세 보기
-│
-└── pom.xml                        # Maven 의존성 관리
-```
 
 ## 🚦 실행 방법 (How to Run)
 1. **프로젝트 임포트**: STS에서 File -> Import -> Existing Maven Projects를 선택하여 프로젝트 폴더를 불러옵니다.
