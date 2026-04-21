@@ -294,6 +294,38 @@ tr:hover { background-color: rgba(255, 127, 80, 0.02); }
                 </c:choose>
             </tbody>
         </table>
+        <%-- ================= 📄 페이징 영역 시작 ================= --%>
+        <div class="pagination" style="text-align: center; margin-top: 30px; margin-bottom: 50px;">
+            <%-- 검색 및 카테고리 유지를 위한 파라미터 묶음 생성 --%>
+            <c:set var="queryParams" value="&category=${param.category != null ? param.category : '전체'}&searchType=${param.searchType}&keyword=${param.keyword}" />
+
+            <%-- [이전] 버튼: 시작 페이지가 1보다 클 때만 (즉, 6, 11, 16... 일 때) --%>
+            <c:if test="${startPage > 1}">
+                <a href="BoardListServlet?page=${startPage - 1}${queryParams}" 
+                   style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">이전</a>
+            </c:if>
+
+            <%-- [1] [2] [3] [4] [5] 페이지 번호 출력 --%>
+            <c:forEach begin="${startPage}" end="${endPage}" var="p">
+                <c:choose>
+                    <c:when test="${p == currentPage}">
+                        <%-- 현재 페이지는 코랄색으로 강조 --%>
+                        <b style="padding: 8px 12px; background-color: #ff7f50; color: white; border-radius: 8px; margin: 0 2px; display: inline-block;">${p}</b>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="BoardListServlet?page=${p}${queryParams}" 
+                           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">${p}</a>
+                    </c:otherwise>
+                </c:choose>
+            </c:forEach>
+
+            <%-- [다음] 버튼: 끝 페이지가 총 페이지 수보다 작을 때만 --%>
+            <c:if test="${endPage < totalPages}">
+                <a href="BoardListServlet?page=${endPage + 1}${queryParams}" 
+                   style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">다음</a>
+            </c:if>
+        </div>
+        <%-- ================= 📄 페이징 영역 끝 ================= --%>
     </c:if>
 </div>
 

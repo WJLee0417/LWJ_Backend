@@ -1,44 +1,46 @@
 package com.test.servlet;
 
+import java.io.IOException;
+
+import com.test.db.MockDB;
+import com.test.dto.Member;
+import com.test.util.PasswordUtil; // 🚀 암호화 유틸리티 임포트 필수!
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import com.test.db.MockDB;
-import com.test.dto.Member;
 
 @WebServlet("/JoinServlet")
 public class JoinServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. 한글 닉네임이 깨지지 않도록 인코딩 (EncodingFilter가 있다면 생략 가능하지만 안전을 위해)
-        request.setCharacterEncoding("UTF-8");
-
-        // 2. 폼에서 넘어온 데이터 받기
+        // 1. 폼에서 넘어온 데이터 받기
         String id = request.getParameter("id");
-        String pw = request.getParameter("pw");
+        String rawPw = request.getParameter("pw"); // 👈 사용자가 입력한 원본 비밀번호
         String name = request.getParameter("name");
+        String part = request.getParameter("part");
 
-        // 3. 중복 아이디 검사 로직 (Map의 containsKey 활용)
+        // 2. 아이디 중복 체크 로직
         if (MockDB.memberTable.containsKey(id)) {
-            // [가입 실패] 이미 존재하는 아이디인 경우
-            request.setAttribute("error", "이미 사용 중인 아이디입니다. 다른 아이디를 입력해 주세요.");
-            
-            // 입력했던 데이터가 날아가지 않도록 다시 join.jsp로 포워드 (응용 실습으로 입력값 유지도 가능!)
+            request.setAttribute("errorMsg", "이미 사용 중인 아이디입니다. 다른 아이디를 입력해 주세요.");
             request.getRequestDispatcher("join.jsp").forward(request, response);
-            
-        } else {
-            // [가입 성공] MockDB에 새로운 Member 객체 생성하여 저장
-            Member newMember = new Member(id, pw, name);
-            MockDB.memberTable.put(id, newMember);
-
-            // 가입이 완료되었으니 로그인 화면으로 이동 (Redirect)
-            // 브라우저에게 "login.jsp로 다시 접속해!" 라고 명령
-            response.sendRedirect("login.jsp");
+            return; // 중복이면 여기서 로직 종료
         }
+
+        // =================================================================
+        // 🚀 3. 비밀번호 암호화 (가장 중요한 부분!)
+        // =================================================================
+        // 사용자가 "1234"를 입력했더라도, DB에는 "03ac6742..." 처럼 들어가게 만듭니다.
+        String hashedPw = PasswordUtil.hashPassword(rawPw);
+
+        // 4. '암호화된 비밀번호'를 담아서 새로운 Member 객체 생성 및 DB 저장
+        Member newMember = new Member(id, hashedPw, name, part);
+        MockDB.memberTable.put(id, newMember);
+
+        // 5. 가입 성공 후 로그인 페이지로 이동 (PRG 패턴)
+        response.sendRedirect("login.jsp");
     }
 }

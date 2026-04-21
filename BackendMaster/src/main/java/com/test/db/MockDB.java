@@ -6,6 +6,7 @@ import java.util.Map;
 import com.test.dto.Board;
 import com.test.dto.Comment;
 import com.test.dto.Member;
+import com.test.util.PasswordUtil;
 
 public class MockDB {
     public static Map<String, Member> memberTable = new HashMap<>();
@@ -16,17 +17,22 @@ public class MockDB {
 
     static {
         // 1. 회원 더미 데이터 세팅 (유저 5명 + 관리자 1명)
-        memberTable.put("admin", new Member("admin", "1234", "관리자"));
-        memberTable.put("user01", new Member("user01", "1111", "백엔드초보"));
-        memberTable.put("user02", new Member("user02", "2222", "JSP마스터"));
-        memberTable.put("user03", new Member("user03", "3333", "쿠키도둑"));
-        memberTable.put("user04", new Member("user04", "4444", "EL매니아"));
-        memberTable.put("user05", new Member("user05", "5555", "필터장인"));
+    	memberTable.put("admin", new Member("admin", PasswordUtil.hashPassword("1234"), "관리자", "공지사항 및 전체 관리"));
+        memberTable.put("user01", new Member("user01", PasswordUtil.hashPassword("1111"), "백엔드초보", "1. Servlet (서블릿) 기초"));
+        memberTable.put("user02", new Member("user02", PasswordUtil.hashPassword("2222"), "JSP마스터", "2. JSP 동작 원리"));
+        memberTable.put("user03", new Member("user03", PasswordUtil.hashPassword("3333"), "쿠키도둑", "3. Session & Cookie"));
+        memberTable.put("user04", new Member("user04", PasswordUtil.hashPassword("4444"), "EL매니아", "4. EL & JSTL 활용"));
+        memberTable.put("user05", new Member("user05", PasswordUtil.hashPassword("5555"), "필터장인", "5. Filter & Listener"));
 
         // =================================================================
         // 2. 게시글 더미 데이터 세팅 (공지 / 학습 / 자유 카테고리 적용)
         // =================================================================
 
+        // 🚀 페이징 테스트용 더미 데이터 115개 자동 생성 로직
+        for (int i = 1; i <= 115; i++) {
+         boardTable.put(boardSeq, new Board(boardSeq++, "자유", "페이징 테스트용 게시물 " + i, "이것은 자동 생성된 내용입니다.", "user01"));
+        }
+        
         boardTable.put(boardSeq, new Board(boardSeq++, "공지", "📢 [공지사항] Backend Master 통합 게시판 오픈 및 실습 안내", 
             "안녕하세요! Backend Master 스터디 그룹에 오신 것을 환영합니다.\n\n" +
             "이곳은 그동안 배운 Servlet, JSP, MVC 패턴 등의 백엔드 기술을 직접 테스트하고 확인해 볼 수 있는 통합 실습 게시판입니다. " +
@@ -105,5 +111,6 @@ public class MockDB {
         
         commentTable.put(commentSeq, new Comment(commentSeq++, 7, "user04", "저도 필터 쪽 오니까 머리가 아프네요 ㅠㅠ 같이 화이팅해요!"));
         commentTable.put(commentSeq, new Comment(commentSeq++, 7, "admin", "어려운 부분은 언제든 스터디 시간에 질문해 주세요 ^^"));
+        
     }
 }

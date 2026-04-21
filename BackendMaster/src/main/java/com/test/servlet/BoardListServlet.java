@@ -82,8 +82,45 @@ public class BoardListServlet extends HttpServlet {
             }
         });
 
-        // 4. 화면으로 데이터 전달
-        request.setAttribute("boardList", boardList);
+        // =================================================================
+        // 🚀 4. 페이징 처리 로직 (Paging Algorithm)
+        // =================================================================
+        // 1) 사용자로부터 요청받은 페이지 번호 (없으면 1페이지)
+        int currentPage = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.isEmpty()) {
+            currentPage = Integer.parseInt(pageParam);
+        }
+
+        // 2) 페이징 설정 변수
+        int postsPerPage = 10; // 한 페이지에 보여줄 게시물 수
+        int pagesPerBlock = 5; // 하단에 보여줄 페이지 번호 개수 (예: 1 2 3 4 5)
+        int totalPosts = boardList.size(); // 총 검색된 게시물 수
+
+        // 3) 총 페이지 수 계산 (나머지가 있으면 1페이지 추가)
+        int totalPages = (int) Math.ceil((double) totalPosts / postsPerPage);
+        if (totalPages == 0) totalPages = 1; // 게시물이 없어도 1페이지는 존재해야 함
+
+        // 4) 현재 페이지에 맞게 리스트 자르기 (SubList)
+        int startIndex = (currentPage - 1) * postsPerPage;
+        int endIndex = Math.min(startIndex + postsPerPage, totalPosts);
+        
+        List<Board> pagedList = new ArrayList<>();
+        if (startIndex < totalPosts) {
+            pagedList = boardList.subList(startIndex, endIndex); // 10개만 싹둑!
+        }
+
+        // 5) 하단 페이징 블록 번호 계산 (예: 현재 3페이지면 블록은 1~5)
+        int startPage = ((currentPage - 1) / pagesPerBlock) * pagesPerBlock + 1;
+        int endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
+
+        // 6) 화면(JSP)으로 데이터 전달
+        request.setAttribute("boardList", pagedList); // 전체가 아닌 '10개'만 전달
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("startPage", startPage);
+        request.setAttribute("endPage", endPage);
+
         request.getRequestDispatcher("board.jsp").forward(request, response);
     }
 
