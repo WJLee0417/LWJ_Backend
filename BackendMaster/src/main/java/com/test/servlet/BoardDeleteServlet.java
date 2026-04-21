@@ -1,38 +1,41 @@
 package com.test.servlet;
 
+import java.io.IOException;
+
+import com.test.db.MockDB;
+import com.test.dto.Board;
+import com.test.dto.Member;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-
-import com.test.db.MockDB;
 
 @WebServlet("/BoardDeleteServlet")
 public class BoardDeleteServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. 보안 확인 (로그인 여부)
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("loginUser") == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
-        // 2. 삭제할 게시글 번호 받기
-        String idStr = request.getParameter("id");
+        Member loginUser = (Member) session.getAttribute("loginUser");
         
-        if (idStr != null) {
-            int id = Integer.parseInt(idStr);
-            // 3. MockDB에서 삭제 실행 (Delete)
-            MockDB.boardTable.remove(id);
+        int id = Integer.parseInt(request.getParameter("id"));
+        
+        // 1. 삭제할 게시글 정보 먼저 가져오기
+        Board targetBoard = MockDB.boardTable.get(id);
+
+        if (targetBoard != null) {
+            // 2. 권한 체크 (관리자이거나 작성자인지 확인)
+            if (loginUser.getId().equals("admin") || loginUser.getId().equals(targetBoard.getAuthorId())) {
+                MockDB.boardTable.remove(id);
+            } else {
+                // 권한이 없는 경우 경고를 띄울 수 있도록 세션 등에 메시지 저장 (선택 사항)
+                System.out.println("⚠️ 경고: " + loginUser.getId() + " 사용자가 비정상적인 삭제 시도를 했습니다.");
+            }
         }
 
-        // 4. 삭제 완료 후 목록 페이지로 Redirect
-        // (Forward를 쓰면 주소창이 DeleteServlet에 머물러 새로고침 시 계속 삭제 시도를 하게 됨)
         response.sendRedirect("BoardListServlet");
     }
 }

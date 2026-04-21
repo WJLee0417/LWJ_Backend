@@ -96,21 +96,28 @@ tr:hover {
 						</tr>
 					</c:when>
 					<c:otherwise>
-						<c:forEach var="board" items="${requestScope.boardList}"
-							varStatus="status">
-							<tr>
-								<td>${status.count}</td>
-
-								<td><c:out value="${board.title}" /></td>
-								<td><c:out value="${board.content}" /></td>
-								<td>${board.authorId}</td>
-
-								<td style="text-align: center;"><a
-									href="BoardDeleteServlet?id=${board.id}"
-									onclick="return confirm('정말 삭제하시겠습니까?');"
-									style="color: red; text-decoration: none; font-weight: bold;">[삭제]</a>
-								</td>
-							</tr>
+						<c:forEach var="board" items="${requestScope.boardList}" varStatus="status">
+    						<tr>
+        						<td>${status.count}</td>
+        						<td><c:out value="${board.title}" /></td>
+        						<td><c:out value="${board.content}" /></td>
+        						<td>${board.authorId}</td>
+        						<td style="text-align: center;">
+            						<%-- 
+               							보안 로직: 
+               							1. 로그인한 유저 ID가 'admin'인 경우 (슈퍼 권한)
+               							2. 혹은 로그인한 유저 ID와 게시글 작성자 ID가 같은 경우
+            						--%>
+            						<c:if test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == board.authorId}">
+                						<a href="BoardDeleteServlet?id=${board.id}" 
+                   						   onclick="return confirm('정말 삭제하시겠습니까?');" 
+                   						   style="color:red; text-decoration:none; font-weight:bold;">[삭제]</a>
+            						</c:if>
+            						<c:if test="${sessionScope.loginUser.id != 'admin' && sessionScope.loginUser.id != board.authorId}">
+                						<span style="color:#ccc; font-size: 0.8em;">권한없음</span>
+            						</c:if>
+        						</td>
+    						</tr>
 						</c:forEach>
 					</c:otherwise>
 				</c:choose>
