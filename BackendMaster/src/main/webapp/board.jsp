@@ -207,12 +207,41 @@ tr:hover { background-color: rgba(255, 127, 80, 0.02); }
                     </c:when>
 
                     <c:otherwise>
+                        <%-- 📌 1. 현재 화면에 띄울 리스트 중 '공지'의 개수를 미리 셉니다. --%>
+                        <c:set var="noticeCount" value="0" />
+                        <c:forEach var="item" items="${requestScope.boardList}">
+                            <c:if test="${item.category == '공지'}">
+                                <c:set var="noticeCount" value="${noticeCount + 1}" />
+                            </c:if>
+                        </c:forEach>
+                        
+                        <%-- 📌 2. 일반 글의 시작 번호 계산 (전체 개수 - 공지 개수) --%>
+                        <c:set var="normalMaxNum" value="${requestScope.boardList.size() - noticeCount}" />
+                        
+                        <%-- 📌 3. 일반 글이 출력될 때마다 1씩 줄여나갈 카운터 변수 --%>
+                        <c:set var="currentNormalNum" value="${normalMaxNum}" />
+
                         <c:forEach var="board" items="${requestScope.boardList}" varStatus="status">
-                            <tr>
-                                <td style="text-align: center; color: #bbb;">${boardList.size() - status.index}</td>
+                            <tr style="${board.category == '공지' ? 'background-color: #fff0e6;' : ''}">
+                                
+                                <%-- 번호 칸 출력 로직 --%>
+                                <td style="text-align: center; color: #bbb;">
+                                    <c:choose>
+                                        <c:when test="${board.category == '공지'}">
+                                            <span style="font-size: 1.2em;" title="고정된 공지사항">📌</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <%-- 일반 글이면 현재 번호를 출력하고, 번호를 1 줄임 --%>
+                                            <c:out value="${currentNormalNum}" />
+                                            <c:set var="currentNormalNum" value="${currentNormalNum - 1}" />
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
                                 
                                 <td style="text-align: center;">
-                                    <span class="cat-badge">${board.category}</span>
+                                    <span class="cat-badge" style="${board.category == '공지' ? 'background-color: #ff7f50; color: white;' : ''}">
+                                        <c:out value="${board.category}" />
+                                    </span>
                                 </td>
 
                                 <td style="text-align: left;">
@@ -221,7 +250,9 @@ tr:hover { background-color: rgba(255, 127, 80, 0.02); }
                                     </a>
                                 </td>
 
-                                <td style="text-align: center; font-weight: 500;">${board.authorId}</td>
+                                <td style="text-align: center; font-weight: 500;">
+                                    <c:out value="${board.authorId}" />
+                                </td>
 
                                 <td style="text-align: center;">
                                     <c:choose>
