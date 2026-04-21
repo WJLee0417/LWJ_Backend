@@ -20,7 +20,23 @@ public class Board {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
     
-    // (기존 id, title, content, authorId의 Getter/Setter는 그대로 유지)
+    public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public void setAuthorId(String authorId) {
+		this.authorId = authorId;
+	}
+
+	// (기존 id, title, content, authorId의 Getter/Setter는 그대로 유지)
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getContent() { return content; }

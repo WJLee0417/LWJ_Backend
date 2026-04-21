@@ -106,6 +106,28 @@
             color: white;
             transform: translateY(-2px);
         }
+        
+        .edit-btn {
+    		display: inline-block;
+    		padding: 8px 18px; /* 버튼 안쪽 여백 */
+    		background-color: #ff7f50; /* 우리 프로젝트 메인 코랄색 */
+    		color: white !important; /* 글자색은 흰색 (강제 적용) */
+    		text-decoration: none; /* 밑줄 제거 */
+    		border-radius: 10px; /* 둥근 모서리 */
+    		font-weight: bold; /* 굵은 글씨 */
+    		font-size: 0.9em; /* 글자 크기 살짝 줄임 */
+    		box-shadow: 0 4px 10px rgba(255, 127, 80, 0.2); /* 은은한 주황색 그림자 */
+    		transition: 0.2s; /* 마우스 올렸을 때 부드러운 효과 */
+    		margin-right: 12px; /* 삭제 링크와의 간격 */
+    		border: none;
+    		cursor: pointer;
+		}
+
+		/* 마우스를 올렸을 때 (Hover) 효과 */
+		.edit-btn:hover {
+    		background-color: #ff6b3d; /* 살짝 진한 코랄색 */
+    		transform: translateY(-1px); /* 위로 1px 살짝 들리는 효과 */
+		}
     </style>
 </head>
 <body>
@@ -137,6 +159,8 @@
                     
                     <%-- 삭제 권한 제어: 관리자 또는 본인 --%>
                     <c:if test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == board.authorId}">
+                        <a href="BoardUpdateServlet?id=${board.id}" class="edit-btn">글 수정</a>
+                        
                         <a href="BoardDeleteServlet?id=${board.id}" 
                            class="btn btn-delete" 
                            onclick="return confirm('이 따뜻한 글을 정말 삭제하시겠습니까?');">삭제하기</a>
