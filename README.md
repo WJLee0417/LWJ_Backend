@@ -10,58 +10,55 @@ Servlet, JSP, Session, Cookie, JSTL/EL, Filter 등 백엔드 기술을 집약하
 - **State Management**: Session, Cookie
 - **Architecture**: MVC Pattern
 
-## 🌟 주요 기능 (Major Features)
+## 🌟 주요 구현 기능 (Key Features)
 
-이 프로젝트는 **MVC 아키텍처**를 준수하며, 사용자 편의성과 서버 보안, 성능 모니터링을 동시에 고려하여 설계되었습니다.
+### 1. 사용자 인증 및 보안 (Security)
+- **Session & Cookie**: 세션을 통한 로그인 상태 유지 및 쿠키를 활용한 '아이디 저장' 기능 구현.
+- **LoginCheckFilter**: 필터를 통해 로그인하지 않은 사용자가 게시판 기능을 이용(URL 직접 입력 등)하려는 시도를 원천 차단.
+- **작성자 기반 권한 제어**: 상세 보기 및 삭제 시, 현재 로그인 유저와 게시글 작성자 ID를 대조하여 본인 또는 관리자(`admin`)만 접근/삭제가 가능하도록 이중 검증(UI/Server).
 
-### 1. 사용자 인증 및 상태 관리 (Authentication & State Management)
-- **세션 기반 로그인**: `HttpSession`을 활용하여 로그인 성공 시 유저 정보를 세션에 저장하고, 전역적으로 사용자 상태를 유지합니다.
-- **쿠키 활용 '아이디 저장'**: 브라우저 쿠키를 생성하여 사용자가 재방문 시 아이디를 자동으로 입력해주는 편의 기능을 제공합니다.
-- **로그아웃 로직**: 세션 파기(`invalidate`)를 통해 안전하게 서버 내 사용자 정보를 제거하고 인증을 해제합니다.
+### 2. 게시판 CRUD 고도화 (Advanced CRUD)
+- **상세 보기 (Detail View)**: 목록에서 제목 클릭 시 해당 게시글의 전체 내용과 메타데이터를 확인할 수 있는 상세 페이지 구현.
+- **가상 번호 시스템**: DB의 고유 ID(PK)가 삭제 등으로 인해 불연속적이어도, 사용자 화면(UI)에서는 항상 1번부터 정렬된 번호를 제공하는 가상 번호 로직 적용.
+- **PRG 패턴 적용**: 글쓰기 및 삭제 작업 후 `Redirect`를 사용하여 새로고침 시 발생할 수 있는 중복 요청 문제 해결.
 
-### 2. 다중 필터 체이닝 (Filter Chaining)
-- **전역 인코딩 필터 (`EncodingFilter`)**: 모든 요청/응답에 `UTF-8`을 적용하여 데이터 전송 시 한글 깨짐 문제를 원천 차단했습니다.
-- **인증 체크 필터 (`LoginCheckFilter`)**: 보호된 경로(게시판 리스트, 글쓰기 등)에 대해 세션 존재 여부를 검사하여 비정상적인 접근을 자동으로 차단합니다.
-- **성능 측정 필터 (`PerformanceFilter`)**: 모든 요청의 시작과 종료 시간을 측정하여 콘솔에 응답 시간을 밀리초(ms) 단위로 출력함으로써 서버 병목 지점을 파악할 수 있게 구현했습니다.
+### 3. 시스템 최적화 및 모니터링 (Monitoring)
+- **PerformanceFilter**: 모든 HTTP 요청의 처리 시간을 측정하여 서버 콘솔에 밀리초(ms) 단위로 출력하는 모니터링 기능 구현.
+- **EncodingFilter**: 전역 인코딩 필터를 통해 비즈니스 로직과 분리된 형태의 한글 처리 자동화.
 
-### 3. 게시판 CRUD 및 데이터 처리 (Board CRUD)
-- **MVC 패턴 적용**: 서블릿(Controller)에서 비즈니스 로직을 처리하고, JSP(View)에서는 데이터 출력에만 집중하도록 역할을 분리했습니다.
-- **Redirect & Forward 전략**: 데이터 조회 시에는 `Forward`를, 데이터 변경(글쓰기/삭제) 후에는 `Redirect`를 사용하여 새로고침 시 발생할 수 있는 중복 요청 문제를 해결했습니다.
-- **가상 번호 로직 개선**: 데이터베이스의 고유 ID(PK)가 아닌, JSTL `varStatus`를 활용하여 화면상에는 항상 1번부터 정렬된 순번을 노출하는 가상 번호 시스템을 적용했습니다.
-
-### 4. 동적 화면 렌더링 (Dynamic View)
-- **JSTL/EL 활용**: JSP 내에서 자바 코드(Scriptlet)를 배제하고 태그 라이브러리와 표현 언어만을 사용하여 유지보수가 용이하고 가독성이 높은 뷰를 구현했습니다.
-- **XSS 방어**: `<c:out>` 태그를 사용하여 사용자가 입력한 HTML 태그가 브라우저에서 실행되지 않도록 안전하게 출력 처리했습니다.
+### 4. 동적 UI 렌더링 (View)
+- **JSTL/EL**: 자바 스크립틀릿을 배제하고 태그 라이브러리를 사용하여 유지보수성이 높은 JSP 화면 구성.
+- **XSS 방어**: `<c:out>` 태그를 사용하여 사용자 입력값에 포함된 악성 스크립트 실행 방지.
 
 ## 🏗 Project Architecture (패키지 구조)
 ```text
 BackendMaster
 ├── src/main/java
 │   ├── com.test.db
-│   │   └── MockDB.java            # Model: 가상 DB 및 초기 데이터 세팅
+│   │   └── MockDB.java            # Model: 가상 DB 및 초기 데이터(Member, Board) 세팅
 │   ├── com.test.dto
-│   │   ├── Member.java            # Model: 회원 정보 데이터 객체
-│   │   └── Board.java             # Model: 게시글 정보 데이터 객체
+│   │   ├── Member.java            # Model: 회원 데이터 객체 (ID, PW, Name)
+│   │   └── Board.java             # Model: 게시글 데이터 객체 (ID, Title, Content, Author)
 │   ├── com.test.filter
-│   │   ├── EncodingFilter.java    # Filter: 전역 UTF-8 인코딩 처리
-│   │   ├── LoginCheckFilter.java  # Filter: 로그인 세션 유무 검증 (보안)
-│   │   └── PerformanceFilter.java # Filter: 응답 속도 측정 및 모니터링
+│   │   ├── EncodingFilter.java    # Filter: 모든 요청/응답 UTF-8 인코딩 (한글 깨짐 방지)
+│   │   ├── LoginCheckFilter.java  # Filter: 미인증 사용자의 게시판 접근 차단 (보안)
+│   │   └── PerformanceFilter.java # Filter: 서버 응답 시간 측정 및 콘솔 출력 (모니터링)
 │   └── com.test.servlet
-│       ├── LoginServlet.java      # Controller: 로그인 처리 및 쿠키 생성
-│       ├── LogoutServlet.java     # Controller: 세션 파기 및 로그아웃
-│       ├── BoardListServlet.java  # Controller: 게시글 목록 조회 및 가상 번호 로직
-│       ├── BoardWriteServlet.java # Controller: 새 글 등록 (Redirect 적용)
-│       └── BoardDeleteServlet.java# Controller: 게시글 삭제 처리
+│       ├── LoginServlet.java      # Controller: 로그인 처리 및 '아이디 저장' 쿠키 생성
+│       ├── LogoutServlet.java     # Controller: 세션 파기 및 로그아웃 처리
+│       ├── BoardListServlet.java  # Controller: 전체 목록 조회 및 가상 번호 부여
+│       ├── BoardDetailServlet.java# Controller: 특정 게시글 상세 조회
+│       ├── BoardWriteServlet.java # Controller: 신규 게시글 등록 (Redirect 적용)
+│       └── BoardDeleteServlet.java# Controller: 본인 확인 후 게시글 삭제 (Security)
 │
 ├── src/main/webapp
-│   ├── index.html                 # View: 프로젝트 메인 대시보드 및 실습 가이드
-│   ├── login.jsp                  # View: 로그인 입력 및 에러 메시지 출력
-│   ├── board.jsp                  # View: 게시판 목록 및 JSTL/EL 기반 렌더링
-│   ├── boardWrite.jsp             # View: 글쓰기 입력 폼
-│   └── WEB-INF
-│       └── web.xml                # Deployment Descriptor (서버 설정)
+│   ├── index.html                 # View: 프로젝트 통합 실습 가이드 대시보드
+│   ├── login.jsp                  # View: 로그인 폼 및 쿠키/에러 메시지 처리
+│   ├── board.jsp                  # View: 게시판 목록 (상세보기 링크 및 삭제 버튼 권한 제어)
+│   ├── boardWrite.jsp             # View: 새 글 작성 입력 폼
+│   └── boardDetail.jsp            # View: 게시글 상세 내용 출력 페이지 (New!)
 │
-└── pom.xml                        # Maven: 라이브러리(Servlet, JSTL) 의존성 관리
+└── pom.xml                        # Maven: 라이브러리(Servlet 6.0, JSTL 3.0) 관리
 ```
 ## 🚀 실행 방법 (How to Run)
 
