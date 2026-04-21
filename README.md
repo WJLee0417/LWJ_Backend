@@ -10,6 +10,13 @@ Servlet, JSP, Session, Cookie, JSTL/EL, Filter 등 백엔드 기술을 집약하
 - **State Management**: Session, Cookie
 - **Architecture**: MVC Pattern
 
+## 🎨 Design Concept: Soft & Friendly
+
+사용자에게 따뜻한 경험을 제공하기 위해 다음 디자인 요소를 적용했습니다.
+- **Color Palette**: 따뜻한 크림 베이스(`#fff5e6`)와 활기찬 코랄 포인트(`#ff7f50`).
+- **Glassmorphism**: 반투명 카드 레이아웃과 블러 효과로 고급스러운 투명감 부여.
+- **Soft UI**: 버튼과 입력창에 `12~25px`의 곡률을 적용하여 부드러운 인상 강조.
+
 ## 🌟 주요 구현 기능 (Key Features)
 
 ### 1. 사용자 인증 및 보안 (Security)
@@ -60,6 +67,20 @@ BackendMaster
 │
 └── pom.xml                        # Maven: 라이브러리(Servlet 6.0, JSTL 3.0) 관리
 ```
+
+## 👥 스터디 그룹 및 테스트 계정
+
+프로젝트의 모든 기능을 직접 테스트해 볼 수 있는 6개의 계정 정보입니다.
+
+| 역할 | ID | PW | 닉네임 | 담당 학습 주제 |
+| :--- | :--- | :--- | :--- | :--- |
+| **관리자** | `admin` | `1234` | 관리자 | 공지사항 및 전체 관리 |
+| **멤버 1** | `user01` | `1111` | 백엔드초보 | 1. Servlet (서블릿) 기초 |
+| **멤버 2** | `user02` | `2222` | JSP마스터 | 2. JSP 동작 원리 |
+| **멤버 3** | `user03` | `3333` | 쿠키도둑 | 3. Session & Cookie |
+| **멤버 4** | `user04` | `4444` | EL매니아 | 4. EL & JSTL 활용 |
+| **멤버 5** | `user05` | `5555` | 필터장인 | 5. Filter & Listener |
+
 ## 🚀 실행 방법 (How to Run)
 
 이 프로젝트는 **STS(Spring Tool Suite)** 환경에서 **Apache Tomcat 11.0**을 기준으로 제작되었습니다.
