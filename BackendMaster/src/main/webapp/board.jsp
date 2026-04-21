@@ -1,196 +1,248 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%-- Tomcat 11.0 (Jakarta EE) 환경에 맞는 JSTL 코어 태그 라이브러리 선언 --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>통합 게시판</title>
+<title>Backend Master - 통합 게시판</title>
 <style>
-/* 전체 배경에 부드러운 느낌 추가 */
+/* 1. 기본 테마 및 폰트 */
 body {
     font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
-    background-color: #fff5e6; /* 크림색 베이스 */
+    background-color: #fff5e6; /* 따뜻한 크림색 */
     padding: 40px 20px;
+    margin: 0;
+    color: #4a3a3a;
 }
 
-.title-link {
-    text-decoration: none;
-    color: #5d4037; /* 따뜻한 느낌의 딥 브라운 */
-    font-weight: 600;
-    transition: color 0.2s ease-in-out;
-}
-
-.title-link:hover {
-    color: #ff7f50; /* 호버 시 포인트 컬러인 코랄색으로 변경 */
-    text-decoration: underline;
-}
-
-/* 게시판을 감싸는 컨테이너 (유리창 효과) */
+/* 2. 메인 컨테이너 (유리창 효과) */
 .main-container {
-    max-width: 900px;
+    max-width: 950px;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.85); /* 반투명 화이트 */
-    backdrop-filter: blur(10px); /* 배경 흐리게 */
-    padding: 30px;
-    border-radius: 25px; /* 둥글게 */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* 은은한 그림자 */
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
+/* 3. 헤더 영역 */
+.header-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-box h2 {
+    margin: 0;
+    color: #5d4037;
+    font-size: 1.8em;
+}
+
+/* 4. 카테고리 탭 디자인 */
+.category-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.tab-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.95em;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+/* 활성화된 탭과 일반 탭 구분 */
+.tab-active { background: #ff7f50; color: white; }
+.tab-inactive { background: #ffefdb; color: #8d6e63; }
+.tab-inactive:hover { background: #ffdcb0; }
+
+/* 5. 버튼 스타일 */
 .write-btn {
     display: inline-block;
-    margin-top: 20px;    /* 위쪽 여백 추가하여 아래로 내림 */
-    margin-bottom: 15px;
+    margin-top: 5px;
+    margin-bottom: 20px;
     padding: 10px 22px;
-    background-color: #ff7f50 !important; /* 코랄 포인트 */
+    background-color: #ff7f50;
     color: white !important;
     text-decoration: none;
     border-radius: 12px;
     font-weight: bold;
     box-shadow: 0 4px 10px rgba(255, 127, 80, 0.2);
+    transition: 0.2s;
 }
+
+.write-btn:hover { transform: translateY(-2px); background-color: #ff6b3d; }
 
 .logout-btn {
-    padding: 6px 12px;
-    background-color: #e0aca2; /* 차분하고 따뜻한 로즈 베이지 */
+    padding: 7px 14px;
+    background-color: #e0aca2; /* 더스티 로즈 */
     color: white !important;
     text-decoration: none;
-    border-radius: 8px; /* 너무 둥글지 않은 적당한 곡률 */
+    border-radius: 8px;
     font-size: 0.85em;
-    transition: background 0.3s;
+    font-weight: bold;
 }
 
-.logout-btn:hover {
-    background-color: #d1968a; /* 마우스 올렸을 때 살짝 진해짐 */
+.logout-btn:hover { background-color: #d1968a; }
+
+/* 6. 테이블 디자인 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: none;
 }
+
+th {
+    border-bottom: 2px solid #ff7f50;
+    color: #8d6e63;
+    padding: 15px;
+    font-size: 0.95em;
+}
+
+td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #f5eee6;
+    color: #555;
+}
+
+/* 카테고리 뱃지 */
+.cat-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f1f3f5;
+    border-radius: 8px;
+    font-size: 0.85em;
+    color: #777;
+    font-weight: 600;
+}
+
+.title-link {
+    text-decoration: none;
+    color: #5d4037;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.title-link:hover { color: #ff7f50; text-decoration: underline; }
 
 .delete-link {
-    color: #c97373 !important; /* 부드러운 인디핑크빛 레드 */
+    color: #c97373 !important; /* 부드러운 레드 */
     text-decoration: none;
     font-weight: bold;
     font-size: 0.9em;
 }
 
-.delete-link:hover {
-    color: #a64d4d !important;
-    text-decoration: underline;
-}
+.delete-link:hover { color: #a64d4d !important; text-decoration: underline; }
 
-/* 테이블 디자인 혁신 */
-table {
-    border: none;
-    margin-top: 25px;
-}
+.auth-label { color: #bbb; font-size: 0.85em; }
 
-th {
-    background-color: transparent; /* 배경 제거 */
-    border-bottom: 2px solid #ff7f50; /* 하단 포인트 선만 유지 */
-    color: #555;
-    padding: 15px;
-}
-
-td {
-    border: none; /* 선 제거 */
-    border-bottom: 1px solid #f0f0f0; /* 아주 연한 구분선 */
-    padding: 15px;
-    color: #444;
-}
-
-/* 번호, 작성자, 관리는 가운데 정렬로 안정감 부여 */
-td:nth-child(1), td:nth-child(3), td:nth-child(4) {
-    text-align: center;
-}
-
-/* 행에 마우스 올렸을 때 효과 */
-tr:hover {
-    background-color: rgba(255, 127, 80, 0.03);
-    transition: 0.3s;
-}
+tr:hover { background-color: rgba(255, 127, 80, 0.02); }
 </style>
 </head>
 <body>
 
-	<%-- 1. 로그인 상태 확인 (인증체크 필터가 있어도 JSP 차원에서 한 번 더 방어) --%>
-	<c:if test="${empty sessionScope.loginUser}">
-		<script>
-			alert("로그인이 필요한 서비스입니다.");
-			location.href = "login.jsp";
-		</script>
-	</c:if>
+<div class="main-container">
+    <%-- 로그인 방어막 --%>
+    <c:if test="${empty sessionScope.loginUser}">
+        <script>
+            alert("로그인이 필요한 서비스입니다.");
+            location.href = "login.jsp";
+        </script>
+    </c:if>
 
-	<c:if test="${not empty sessionScope.loginUser}">
+    <c:if test="${not empty sessionScope.loginUser}">
+        <%-- 상단 헤더 영역 --%>
+        <div class="header-box">
+            <h2>📝 Backend Master 스터디</h2>
+            <div>
+                <span style="font-size: 0.95em; margin-right: 10px;">
+                    <b>${sessionScope.loginUser.name}</b>님, 안녕하세요!
+                </span> 
+                <a href="LogoutServlet" class="logout-btn">로그아웃</a>
+            </div>
+        </div>
 
-		<%-- 상단 헤더 영역: 사용자 인사 및 로그아웃 [cite: 1693, 1755] --%>
-		<div class="header">
-			<h2>📝 Backend Master 통합 게시판</h2>
-			<div>
-				<span>환영합니다, <b>${sessionScope.loginUser.name}</b>님!
-				</span> <a href="LogoutServlet" class="logout-btn">로그아웃</a>
-			</div>
-		</div>
+        <%-- 카테고리 필터링 탭 --%>
+        <div class="category-tabs">
+            <a href="BoardListServlet?category=전체" 
+               class="tab-btn ${currentCategory == '전체' || empty currentCategory ? 'tab-active' : 'tab-inactive'}">전체보기</a>
+            <a href="BoardListServlet?category=공지" 
+               class="tab-btn ${currentCategory == '공지' ? 'tab-active' : 'tab-inactive'}">📢 공지사항</a>
+            <a href="BoardListServlet?category=학습" 
+               class="tab-btn ${currentCategory == '학습' ? 'tab-active' : 'tab-inactive'}">📚 학습기록</a>
+            <a href="BoardListServlet?category=자유" 
+               class="tab-btn ${currentCategory == '자유' ? 'tab-active' : 'tab-inactive'}">💬 자유게시판</a>
+        </div>
 
-		<hr>
+        <%-- 액션 버튼 영역 --%>
+        <div style="display: flex; justify-content: flex-end;">
+            <a href="boardWrite.jsp" class="write-btn">+ 새 글 작성하기</a>
+        </div>
 
-		<%-- 글쓰기 버튼 추가 [cite: 1400] --%>
-		<a href="boardWrite.jsp" class="write-btn">+ 새 글 쓰기</a>
+        <%-- 게시판 테이블 --%>
+        <table>
+            <thead>
+                <tr>
+                    <th width="8%">번호</th>
+                    <th width="12%">분류</th>
+                    <th width="45%">제목</th>
+                    <th width="15%">작성자</th>
+                    <th width="10%">관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:choose>
+                    <c:when test="${empty requestScope.boardList}">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 100px 0; color: #999;">
+                                선택하신 카테고리에 등록된 글이 없습니다.<br>첫 번째 이야기의 주인공이 되어보세요!
+                            </td>
+                        </tr>
+                    </c:when>
 
-		<table>
-			<thead>
-				<tr>
-					<th width="8%">번호</th>
-					<th width="40%">제목</th>
-					<th width="15%">작성자</th>
-					<th width="12%">관리</th>
-				</tr>
-			</thead>
-			<tbody>
-				<c:choose>
-					<%-- 게시글이 없는 경우 처리 [cite: 1509, 1550] --%>
-					<c:when test="${empty requestScope.boardList}">
-						<tr>
-							<td colspan="4" class="empty-msg">등록된 게시글이 없습니다. 첫 글의 주인공이
-								되어보세요!</td>
-						</tr>
-					</c:when>
+                    <c:otherwise>
+                        <c:forEach var="board" items="${requestScope.boardList}" varStatus="status">
+                            <tr>
+                                <td style="text-align: center; color: #bbb;">${boardList.size() - status.index}</td>
+                                
+                                <td style="text-align: center;">
+                                    <span class="cat-badge">${board.category}</span>
+                                </td>
 
-					<%-- 게시글 목록 출력 --%>
-					<c:otherwise>
-						<%-- varStatus="status"를 통해 가상 번호 구현 [cite: 1084] --%>
-						<c:forEach var="board" items="${requestScope.boardList}"
-							varStatus="status">
-							<tr>
-								<%-- 가상 번호: DB ID 대신 1부터 순서대로 출력 [cite: 1084] --%>
-								<td style="text-align: center;">${status.count}</td>
+                                <td style="text-align: left;">
+                                    <a href="BoardDetailServlet?id=${board.id}" class="title-link">
+                                        <c:out value="${board.title}" />
+                                    </a>
+                                </td>
 
-								<%-- 제목 클릭 시 상세보기로 이동 (쿼리 스트링 전달) [cite: 1172, 1173] --%>
-								<td><a href="BoardDetailServlet?id=${board.id}"
-									class="title-link"> <c:out value="${board.title}" />
-								</a></td>
+                                <td style="text-align: center; font-weight: 500;">${board.authorId}</td>
 
-								<td style="text-align: center;">${board.authorId}</td>
-
-								<%-- 삭제 권한 제어: 관리자이거나 작성자 본인일 때만 버튼 노출 --%>
-								<td style="text-align: center;"><c:choose>
-										<c:when
-											test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == board.authorId}">
-											<a href="BoardDeleteServlet?id=${board.id}"
-												onclick="return confirm('정말 이 게시글을 삭제하시겠습니까?');"
-												style="color: #d9534f; text-decoration: none; font-weight: bold;">[삭제]</a>
-										</c:when>
-										<c:otherwise>
-											<span class="auth-label">권한없음</span>
-										</c:otherwise>
-									</c:choose></td>
-							</tr>
-						</c:forEach>
-					</c:otherwise>
-				</c:choose>
-			</tbody>
-		</table>
-
-	</c:if>
+                                <td style="text-align: center;">
+                                    <c:choose>
+                                        <c:when test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == board.authorId}">
+                                            <a href="BoardDeleteServlet?id=${board.id}" 
+                                               class="delete-link"
+                                               onclick="return confirm('이 글을 정말 삭제하시겠습니까?');">[삭제]</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="auth-label">권한없음</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
+            </tbody>
+        </table>
+    </c:if>
+</div>
 
 </body>
 </html>

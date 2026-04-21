@@ -48,8 +48,8 @@
             font-size: 0.95em;
         }
 
-        /* 텍스트 입력창과 본문 입력창 공통 스타일 */
-        input[type="text"], textarea {
+        /* 📌 텍스트 입력창, 본문 입력창, 그리고 새로 추가된 Select 박스 공통 스타일 */
+        input[type="text"], textarea, select {
             width: 100%;
             padding: 15px;
             border: 1px solid #e0e0e0;
@@ -62,9 +62,18 @@
             background-color: rgba(255, 255, 255, 0.8);
         }
 
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus, textarea:focus, select:focus {
             border-color: #ff7f50; /* 포커스 시 코랄색 강조 */
             outline: none;
+        }
+
+        /* 카테고리 셀렉트 박스 커서 모양 변경 */
+        select {
+            cursor: pointer;
+            appearance: none; /* 기본 화살표 숨기기 */
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%235d4037" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
         }
 
         /* 작성자 고정 칸 (수정 불가 스타일) */
@@ -130,12 +139,25 @@
     <div class="write-container">
         <h2>✨ 새 글 작성</h2>
 
-        <%-- 파일 전송이 없다면 enctype은 생략. BoardWriteServlet으로 전송합니다. --%>
         <form action="BoardWriteServlet" method="post">
             
+            <%-- 📌 카테고리 선택 영역 추가 --%>
+            <div class="form-group">
+                <label for="category">카테고리</label>
+                <select id="category" name="category" required autofocus>
+                    <%-- 로그인 유저가 admin일 때만 공지사항 옵션 활성화 --%>
+                    <c:if test="${sessionScope.loginUser.id == 'admin'}">
+                        <option value="공지">📢 공지사항</option>
+                    </c:if>
+                    <option value="학습" selected>📚 학습기록</option>
+                    <option value="자유">💬 자유게시판</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="title">제목</label>
-                <input type="text" id="title" name="title" placeholder="어떤 이야기를 나누고 싶으신가요?" required autofocus>
+                <%-- autofocus는 카테고리(select)로 이동시켰습니다. --%>
+                <input type="text" id="title" name="title" placeholder="어떤 이야기를 나누고 싶으신가요?" required>
             </div>
             
             <div class="form-group">
