@@ -42,30 +42,32 @@ Servlet, JSP, Session, Cookie, JSTL/EL, Filter 등 백엔드 기술을 집약하
 BackendMaster
 ├── src/main/java
 │   ├── com.test.db
-│   │   └── MockDB.java            # Model: 가상 DB 및 초기 데이터(Member, Board) 세팅
+│   │   └── MockDB.java            # Model: 가상 DB (회원 5명 + 게시글 5개 초기화)
 │   ├── com.test.dto
-│   │   ├── Member.java            # Model: 회원 데이터 객체 (ID, PW, Name)
-│   │   └── Board.java             # Model: 게시글 데이터 객체 (ID, Title, Content, Author)
+│   │   ├── Member.java            # Model: 회원 객체 (id, pw, name)
+│   │   └── Board.java             # Model: 게시글 객체 (id, title, content, authorId)
 │   ├── com.test.filter
-│   │   ├── EncodingFilter.java    # Filter: 모든 요청/응답 UTF-8 인코딩 (한글 깨짐 방지)
-│   │   ├── LoginCheckFilter.java  # Filter: 미인증 사용자의 게시판 접근 차단 (보안)
-│   │   └── PerformanceFilter.java # Filter: 서버 응답 시간 측정 및 콘솔 출력 (모니터링)
+│   │   ├── EncodingFilter.java    # Filter: 전역 UTF-8 인코딩
+│   │   ├── PerformanceFilter.java # Filter: 응답 시간 측정 및 로깅
+│   │   └── LoginCheckFilter.java  # Filter: 미인증 유저 게시판 차단 (회원가입/로그인 예외)
 │   └── com.test.servlet
-│       ├── LoginServlet.java      # Controller: 로그인 처리 및 '아이디 저장' 쿠키 생성
-│       ├── LogoutServlet.java     # Controller: 세션 파기 및 로그아웃 처리
-│       ├── BoardListServlet.java  # Controller: 전체 목록 조회 및 가상 번호 부여
-│       ├── BoardDetailServlet.java# Controller: 특정 게시글 상세 조회
-│       ├── BoardWriteServlet.java # Controller: 신규 게시글 등록 (Redirect 적용)
-│       └── BoardDeleteServlet.java# Controller: 본인 확인 후 게시글 삭제 (Security)
+│       ├── JoinServlet.java       # Controller: [New] 회원가입 및 ID 중복 검사
+│       ├── LoginServlet.java      # Controller: 로그인 처리 및 쿠키/세션 생성
+│       ├── LogoutServlet.java     # Controller: 로그아웃 및 세션 파기
+│       ├── BoardListServlet.java  # Controller: 게시판 목록 조회 (가상 번호 적용)
+│       ├── BoardWriteServlet.java # Controller: 새 글 작성 (PRG 패턴 적용)
+│       ├── BoardDetailServlet.java# Controller: 글 상세 조회
+│       └── BoardDeleteServlet.java# Controller: 본인/관리자 권한 확인 후 삭제
 │
 ├── src/main/webapp
-│   ├── index.html                 # View: 프로젝트 통합 실습 가이드 대시보드
-│   ├── login.jsp                  # View: 로그인 폼 및 쿠키/에러 메시지 처리
-│   ├── board.jsp                  # View: 게시판 목록 (상세보기 링크 및 삭제 버튼 권한 제어)
-│   ├── boardWrite.jsp             # View: 새 글 작성 입력 폼
-│   └── boardDetail.jsp            # View: 게시글 상세 내용 출력 페이지 (New!)
+│   ├── index.html                 # View: 프로젝트 통합 대시보드 및 가이드
+│   ├── join.jsp                   # View: [New] 신규 회원가입 폼
+│   ├── login.jsp                  # View: 로그인 폼
+│   ├── board.jsp                  # View: JSTL/EL 기반 게시판 목록
+│   ├── boardWrite.jsp             # View: 새 글 작성 폼 (작성자명 고정)
+│   └── boardDetail.jsp            # View: 게시글 상세 보기 및 삭제 버튼
 │
-└── pom.xml                        # Maven: 라이브러리(Servlet 6.0, JSTL 3.0) 관리
+└── pom.xml                        # Maven: Servlet API 6.0, JSTL 3.0 의존성 관리
 ```
 
 ## 👥 스터디 그룹 및 테스트 계정
