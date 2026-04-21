@@ -184,6 +184,28 @@ tr:hover { background-color: rgba(255, 127, 80, 0.02); }
         <div style="display: flex; justify-content: flex-end;">
             <a href="boardWrite.jsp" class="write-btn">+ 새 글 작성하기</a>
         </div>
+        
+        <%-- ================= 🔍 검색 영역 시작 ================= --%>
+        <div class="search-container" style="background: rgba(255,255,255,0.6); padding: 15px 25px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: flex-end; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+            <form action="BoardListServlet" method="get" style="display: flex; gap: 10px; width: 100%; max-width: 500px;">
+                <%-- 현재 카테고리 탭을 유지하면서 검색하기 위한 hidden 값 --%>
+                <input type="hidden" name="category" value="${param.category != null ? param.category : '전체'}">
+                
+                <select name="searchType" style="padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; outline: none; color: #555;">
+                    <option value="title" ${param.searchType == 'title' ? 'selected' : ''}>제목</option>
+                    <option value="content" ${param.searchType == 'content' ? 'selected' : ''}>내용</option>
+                    <option value="author" ${param.searchType == 'author' ? 'selected' : ''}>작성자</option>
+                </select>
+                
+                <input type="text" name="keyword" value="${param.keyword}" placeholder="검색어를 입력하세요" 
+                       style="flex-grow: 1; padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 8px; outline: none;">
+                
+                <button type="submit" style="padding: 10px 20px; background-color: #8d6e63; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;">
+                    검색
+                </button>
+            </form>
+        </div>
+        <%-- ================= 🔍 검색 영역 끝 ================= --%>
 
         <%-- 게시판 테이블 --%>
         <table>
