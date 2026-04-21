@@ -17,10 +17,10 @@ public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. 클라이언트가 폼에서 보낸 데이터 받기
+        // 1. 클라이언트가 폼에서 보낸 데이터 받기 (JSP의 name 속성과 일치시켜야 함)
         String id = request.getParameter("id");
-        String password = request.getParameter("password");
-        String remember = request.getParameter("remember"); // 체크박스 (체크 안 하면 null)
+        String password = request.getParameter("pw"); // "password" -> "pw"로 수정
+        String remember = request.getParameter("remember"); 
 
         // 2. MockDB에서 해당 아이디의 회원 정보 조회
         Member member = MockDB.memberTable.get(id);
@@ -28,33 +28,26 @@ public class LoginServlet extends HttpServlet {
         // 3. 로그인 검증
         if (member != null && member.getPassword().equals(password)) {
             // [로그인 성공]
-
-            // Session 금고에 유저 정보 저장
             HttpSession session = request.getSession();
             session.setAttribute("loginUser", member); 
 
-            // Cookie 생성 및 수명 설정 (아이디 저장)
             Cookie idCookie = new Cookie("rememberId", id);
             if (remember != null) {
-                // 체크박스 선택 시: 7일 유지
                 idCookie.setMaxAge(60 * 60 * 24 * 7); 
             } else {
-                // 체크 해제 시: 쿠키 수명을 0으로 만들어 즉시 파기
                 idCookie.setMaxAge(0); 
             }
-            // 브라우저로 쿠키 전송
             response.addCookie(idCookie);
 
-            // 성공 시 게시판 목록 서블릿으로 방향 틀기 (Redirect)
+            // 성공 시 게시판 목록으로 리다이렉트
             response.sendRedirect("BoardListServlet"); 
             
         } else {
             // [로그인 실패]
+            // login.jsp에서 ${error}로 쓰고 있으므로 이름을 "error"로 수정
+            request.setAttribute("error", "아이디 또는 비밀번호가 일치하지 않습니다.");
             
-            // Request 수납장에 에러 메시지 저장
-            request.setAttribute("errorMessage", "아이디 또는 비밀번호가 일치하지 않습니다.");
-            
-            // 사용자의 URL 주소창은 유지한 채, 에러 메시지를 들고 다시 로그인 화면으로 돌아감 (Forward)
+            // 다시 로그인 화면으로 포워드 (이때 네트워크 탭에 200이 뜹니다)
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }

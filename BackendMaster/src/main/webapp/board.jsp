@@ -9,80 +9,104 @@
 <meta charset="UTF-8">
 <title>통합 게시판</title>
 <style>
+/* 전체 배경에 부드러운 느낌 추가 */
 body {
-	font-family: 'Malgun Gothic', sans-serif;
-	padding: 20px;
-	max-width: 900px;
-	margin: 0 auto;
-}
-
-.header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 20px;
-}
-
-.logout-btn {
-	padding: 5px 15px;
-	background-color: #ff4d4d;
-	color: white;
-	text-decoration: none;
-	border-radius: 4px;
-	font-size: 0.9em;
-}
-
-.write-btn {
-	display: inline-block;
-	margin-bottom: 10px;
-	padding: 8px 18px;
-	background-color: #007bff;
-	color: white;
-	text-decoration: none;
-	border-radius: 4px;
-	font-weight: bold;
-}
-
-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 10px;
-}
-
-th, td {
-	border: 1px solid #ddd;
-	padding: 12px;
-	text-align: left;
-}
-
-th {
-	background-color: #f8f9fa;
-}
-
-tr:hover {
-	background-color: #fcfcfc;
-}
-
-.empty-msg {
-	text-align: center;
-	color: #888;
-	padding: 30px;
-}
-
-.auth-label {
-	color: #ccc;
-	font-size: 0.85em;
+    font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+    background-color: #fff5e6; /* 크림색 베이스 */
+    padding: 40px 20px;
 }
 
 .title-link {
-	text-decoration: none;
-	color: #333;
-	font-weight: 500;
+    text-decoration: none;
+    color: #5d4037; /* 따뜻한 느낌의 딥 브라운 */
+    font-weight: 600;
+    transition: color 0.2s ease-in-out;
 }
 
 .title-link:hover {
-	text-decoration: underline;
-	color: #0056b3;
+    color: #ff7f50; /* 호버 시 포인트 컬러인 코랄색으로 변경 */
+    text-decoration: underline;
+}
+
+/* 게시판을 감싸는 컨테이너 (유리창 효과) */
+.main-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.85); /* 반투명 화이트 */
+    backdrop-filter: blur(10px); /* 배경 흐리게 */
+    padding: 30px;
+    border-radius: 25px; /* 둥글게 */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* 은은한 그림자 */
+}
+
+.write-btn {
+    display: inline-block;
+    margin-top: 20px;    /* 위쪽 여백 추가하여 아래로 내림 */
+    margin-bottom: 15px;
+    padding: 10px 22px;
+    background-color: #ff7f50 !important; /* 코랄 포인트 */
+    color: white !important;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(255, 127, 80, 0.2);
+}
+
+.logout-btn {
+    padding: 6px 12px;
+    background-color: #e0aca2; /* 차분하고 따뜻한 로즈 베이지 */
+    color: white !important;
+    text-decoration: none;
+    border-radius: 8px; /* 너무 둥글지 않은 적당한 곡률 */
+    font-size: 0.85em;
+    transition: background 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: #d1968a; /* 마우스 올렸을 때 살짝 진해짐 */
+}
+
+.delete-link {
+    color: #c97373 !important; /* 부드러운 인디핑크빛 레드 */
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.delete-link:hover {
+    color: #a64d4d !important;
+    text-decoration: underline;
+}
+
+/* 테이블 디자인 혁신 */
+table {
+    border: none;
+    margin-top: 25px;
+}
+
+th {
+    background-color: transparent; /* 배경 제거 */
+    border-bottom: 2px solid #ff7f50; /* 하단 포인트 선만 유지 */
+    color: #555;
+    padding: 15px;
+}
+
+td {
+    border: none; /* 선 제거 */
+    border-bottom: 1px solid #f0f0f0; /* 아주 연한 구분선 */
+    padding: 15px;
+    color: #444;
+}
+
+/* 번호, 작성자, 관리는 가운데 정렬로 안정감 부여 */
+td:nth-child(1), td:nth-child(3), td:nth-child(4) {
+    text-align: center;
+}
+
+/* 행에 마우스 올렸을 때 효과 */
+tr:hover {
+    background-color: rgba(255, 127, 80, 0.03);
+    transition: 0.3s;
 }
 </style>
 </head>
