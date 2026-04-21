@@ -1,78 +1,21 @@
-# 🚀 BackendMaster (통합 자바 웹 프로젝트)
+# 🚀 BackendMaster (Study Group Board)
 
-Servlet, JSP, Session, Cookie, JSTL/EL, Filter 등 백엔드 기술을 집약하여 만든 **MVC 아키텍처 기반의 게시판 프로젝트**입니다.
+**Servlet, JSP, Filter, Session & Cookie**를 총망라한 MVC 기반 통합 웹 프로젝트입니다. 5명의 스터디원이 각각의 백엔드 주제를 정리하고 공유하는 **'감성 스터디 게시판'** 컨셉으로 제작되었으며, 카테고리 필터링과 신규 스터디원의 회원가입 기능까지 완벽하게 지원합니다.
 
-## 🛠 Tech Stack
-- **Language**: Java 17+ (Jakarta EE)
-- **Server**: Apache Tomcat 11.0
-- **Build Tool**: Maven
-- **Library**: Jakarta Servlet API, JSTL
-- **State Management**: Session, Cookie
-- **Architecture**: MVC Pattern
+---
 
 ## 🎨 Design Concept: Soft & Friendly
 
-사용자에게 따뜻한 경험을 제공하기 위해 다음 디자인 요소를 적용했습니다.
+사용자에게 따뜻하고 편안한 경험을 제공하기 위해 다음 디자인 요소를 적용했습니다.
 - **Color Palette**: 따뜻한 크림 베이스(`#fff5e6`)와 활기찬 코랄 포인트(`#ff7f50`).
 - **Glassmorphism**: 반투명 카드 레이아웃과 블러 효과로 고급스러운 투명감 부여.
 - **Soft UI**: 버튼과 입력창에 `12~25px`의 곡률을 적용하여 부드러운 인상 강조.
 
-## 🌟 주요 구현 기능 (Key Features)
-
-### 1. 사용자 인증 및 보안 (Security)
-- **Session & Cookie**: 세션을 통한 로그인 상태 유지 및 쿠키를 활용한 '아이디 저장' 기능 구현.
-- **LoginCheckFilter**: 필터를 통해 로그인하지 않은 사용자가 게시판 기능을 이용(URL 직접 입력 등)하려는 시도를 원천 차단.
-- **작성자 기반 권한 제어**: 상세 보기 및 삭제 시, 현재 로그인 유저와 게시글 작성자 ID를 대조하여 본인 또는 관리자(`admin`)만 접근/삭제가 가능하도록 이중 검증(UI/Server).
-
-### 2. 게시판 CRUD 고도화 (Advanced CRUD)
-- **상세 보기 (Detail View)**: 목록에서 제목 클릭 시 해당 게시글의 전체 내용과 메타데이터를 확인할 수 있는 상세 페이지 구현.
-- **가상 번호 시스템**: DB의 고유 ID(PK)가 삭제 등으로 인해 불연속적이어도, 사용자 화면(UI)에서는 항상 1번부터 정렬된 번호를 제공하는 가상 번호 로직 적용.
-- **PRG 패턴 적용**: 글쓰기 및 삭제 작업 후 `Redirect`를 사용하여 새로고침 시 발생할 수 있는 중복 요청 문제 해결.
-
-### 3. 시스템 최적화 및 모니터링 (Monitoring)
-- **PerformanceFilter**: 모든 HTTP 요청의 처리 시간을 측정하여 서버 콘솔에 밀리초(ms) 단위로 출력하는 모니터링 기능 구현.
-- **EncodingFilter**: 전역 인코딩 필터를 통해 비즈니스 로직과 분리된 형태의 한글 처리 자동화.
-
-### 4. 동적 UI 렌더링 (View)
-- **JSTL/EL**: 자바 스크립틀릿을 배제하고 태그 라이브러리를 사용하여 유지보수성이 높은 JSP 화면 구성.
-- **XSS 방어**: `<c:out>` 태그를 사용하여 사용자 입력값에 포함된 악성 스크립트 실행 방지.
-
-## 🏗 Project Architecture (패키지 구조)
-```text
-BackendMaster
-├── src/main/java
-│   ├── com.test.db
-│   │   └── MockDB.java            # Model: 가상 DB (회원 5명 + 게시글 5개 초기화)
-│   ├── com.test.dto
-│   │   ├── Member.java            # Model: 회원 객체 (id, pw, name)
-│   │   └── Board.java             # Model: 게시글 객체 (id, title, content, authorId)
-│   ├── com.test.filter
-│   │   ├── EncodingFilter.java    # Filter: 전역 UTF-8 인코딩
-│   │   ├── PerformanceFilter.java # Filter: 응답 시간 측정 및 로깅
-│   │   └── LoginCheckFilter.java  # Filter: 미인증 유저 게시판 차단 (회원가입/로그인 예외)
-│   └── com.test.servlet
-│       ├── JoinServlet.java       # Controller: [New] 회원가입 및 ID 중복 검사
-│       ├── LoginServlet.java      # Controller: 로그인 처리 및 쿠키/세션 생성
-│       ├── LogoutServlet.java     # Controller: 로그아웃 및 세션 파기
-│       ├── BoardListServlet.java  # Controller: 게시판 목록 조회 (가상 번호 적용)
-│       ├── BoardWriteServlet.java # Controller: 새 글 작성 (PRG 패턴 적용)
-│       ├── BoardDetailServlet.java# Controller: 글 상세 조회
-│       └── BoardDeleteServlet.java# Controller: 본인/관리자 권한 확인 후 삭제
-│
-├── src/main/webapp
-│   ├── index.html                 # View: 프로젝트 통합 대시보드 및 가이드
-│   ├── join.jsp                   # View: [New] 신규 회원가입 폼
-│   ├── login.jsp                  # View: 로그인 폼
-│   ├── board.jsp                  # View: JSTL/EL 기반 게시판 목록
-│   ├── boardWrite.jsp             # View: 새 글 작성 폼 (작성자명 고정)
-│   └── boardDetail.jsp            # View: 게시글 상세 보기 및 삭제 버튼
-│
-└── pom.xml                        # Maven: Servlet API 6.0, JSTL 3.0 의존성 관리
-```
+---
 
 ## 👥 스터디 그룹 및 테스트 계정
 
-프로젝트의 모든 기능을 직접 테스트해 볼 수 있는 6개의 계정 정보입니다.
+프로젝트의 모든 기능을 직접 테스트해 볼 수 있는 초기 계정 정보입니다. **(신규 회원가입 테스트도 가능합니다!)**
 
 | 역할 | ID | PW | 닉네임 | 담당 학습 주제 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -83,32 +26,78 @@ BackendMaster
 | **멤버 4** | `user04` | `4444` | EL매니아 | 4. EL & JSTL 활용 |
 | **멤버 5** | `user05` | `5555` | 필터장인 | 5. Filter & Listener |
 
-## 🚀 실행 방법 (How to Run)
+---
 
-이 프로젝트는 **STS(Spring Tool Suite)** 환경에서 **Apache Tomcat 11.0**을 기준으로 제작되었습니다.
+## 🌟 주요 기능 (Key Features)
 
-### 1. 사전 준비 (Prerequisites)
-- **Java**: JDK 17 이상 권장
-- **IDE**: STS 4 또는 STS 5 (Eclipse 가능)
+### 1. 고도화된 게시판 로직 (Advanced Board)
+- **카테고리 필터링**: `전체`, `공지사항`, `학습기록`, `자유게시판` 탭을 제공하여 관심 있는 주제의 글만 모아볼 수 있습니다.
+- **공지사항 상단 고정 (Pinned)**: 어느 카테고리 탭을 선택하더라도 '공지' 게시물은 항상 최상단에 하이라이트(📌)되어 노출됩니다.
+- **정교한 가상 번호 시스템**: 최상단에 고정된 공지사항을 제외하고, 일반 게시글의 개수만을 정확히 카운트하여 역순으로 가상 번호를 매기는 렌더링 로직을 구현했습니다.
+- **PRG 패턴 (Post-Redirect-Get)**: 글 작성/삭제 및 회원가입 후 리다이렉트 처리를 통해 브라우저 새로고침 시 발생하는 중복 요청을 방지합니다.
+
+### 2. 사용자 인증 및 보안 (Security & Auth)
+- **보안 필터 (LoginCheckFilter)**: 미인증 유저의 게시판 접근을 전역적으로 차단하되, 로그인과 회원가입 로직은 예외 처리하여 유연한 보안망을 구축했습니다.
+- **작성자 기반 권한**: 본인이 작성한 글만 삭제할 수 있으며, 서버 측에서 이중 검증합니다. (관리자 `admin`은 전체 삭제 가능)
+- **상태 유지**: `Session`을 통한 로그인 상태 유지 및 `Cookie`를 활용한 '아이디 저장' 기능을 제공합니다.
+- **아이디 중복 검사**: 회원가입 시 `MockDB`를 조회하여 중복된 아이디 가입을 방지합니다.
+
+### 3. 모니터링 및 성능 (Performance)
+- **PerformanceFilter**: 모든 HTTP 요청의 처리 속도를 밀리초(ms) 단위로 측정하여 서버 콘솔에 기록합니다.
+- **EncodingFilter**: 전역 UTF-8 필터 설정을 통해 한글 깨짐 문제를 일괄적으로 해결했습니다.
+
+---
+
+## 🛠 Tech Stack
+
+- **IDE**: Spring Tool Suite (STS) 5
+- **Language**: Java 17+
+- **Spec**: Jakarta EE 10 (Servlet 6.0, JSP 3.1)
 - **Server**: Apache Tomcat 11.0
-- **Build**: Maven
+- **Library**: JSTL 3.0
+- **Build Tool**: Maven
 
-### 2. 프로젝트 임포트 (Import)
-1. GitHub 저장소를 클론하거나 ZIP 파일을 다운로드합니다.
-2. STS에서 `File` -> `Import...`를 클릭합니다.
-3. `Maven` -> `Existing Maven Projects`를 선택하고 프로젝트 폴더를 지정하여 완료합니다.
+---
 
-### 3. 라이브러리 및 환경 설정
-1. **Maven Update**: 프로젝트 우클릭 -> `Maven` -> `Update Project...` (단축키 `Alt + F5`)를 눌러 의존성 라이브러리를 다운로드합니다.
-2. **Server 설정**: 
-   - 프로젝트 우클릭 -> `Properties` -> `Targeted Runtimes`.
-   - `Apache Tomcat v11.0`을 체크하고 적용합니다.
+## 📂 프로젝트 아키텍처 (Architecture)
 
-### 4. 실행 (Run)
-1. `src/main/webapp/index.html` 파일을 우클릭합니다.
-2. `Run As` -> `Run on Server`를 선택합니다.
-3. 구성된 Tomcat 11 서버를 선택하여 실행합니다.
+MVC 패턴을 준수하며, 공통 관심사를 Filter 레이어에서 처리하는 실무 지향적 구조입니다.
 
-### 5. 접속 주소
-- 메인 가이드: `http://localhost:8080/BackendMaster/index.html`
-- 로그인 페이지: `http://localhost:8080/BackendMaster/login.jsp`
+```text
+BackendMaster
+├── src/main/java
+│   ├── com.test.db
+│   │   └── MockDB.java            # Model: 가상 DB (카테고리별 더미 데이터 초기화)
+│   ├── com.test.dto
+│   │   ├── Member.java            # Model: 회원 정보
+│   │   └── Board.java             # Model: 게시글 정보 (Category 필드 포함)
+│   ├── com.test.filter
+│   │   ├── EncodingFilter.java    # Filter: 전역 UTF-8 인코딩
+│   │   ├── PerformanceFilter.java # Filter: 응답 시간 측정 및 로깅
+│   │   └── LoginCheckFilter.java  # Filter: 미인증 유저 게시판 차단
+│   └── com.test.servlet
+│       ├── JoinServlet.java       # Controller: 회원가입 및 ID 중복 검사
+│       ├── LoginServlet.java      # Controller: 로그인 처리 및 쿠키/세션 생성
+│       ├── LogoutServlet.java     # Controller: 로그아웃 및 세션 파기
+│       ├── BoardListServlet.java  # Controller: 카테고리 필터링 및 공지사항 정렬
+│       ├── BoardWriteServlet.java # Controller: 새 글 및 카테고리 작성
+│       ├── BoardDetailServlet.java# Controller: 글 상세 조회
+│       └── BoardDeleteServlet.java# Controller: 게시글 삭제 처리
+│
+├── src/main/webapp
+│   ├── index.html                 # View: 프로젝트 통합 대시보드 및 가이드
+│   ├── join.jsp                   # View: 신규 회원가입 폼
+│   ├── login.jsp                  # View: 로그인 폼
+│   ├── board.jsp                  # View: 탭 기반 카테고리 목록 및 JSTL 동적 렌더링
+│   ├── boardWrite.jsp             # View: 새 글 작성 폼 (권한별 카테고리 select)
+│   └── boardDetail.jsp            # View: 게시글 상세 보기
+│
+└── pom.xml                        # Maven 의존성 관리
+```
+
+## 🚦 실행 방법 (How to Run)
+1. **프로젝트 임포트**: STS에서 File -> Import -> Existing Maven Projects를 선택하여 프로젝트 폴더를 불러옵니다.
+2. **의존성 업데이트**: 프로젝트 우클릭 -> Maven -> Update Project (Shortcut: Alt+F5)를 클릭하여 필요한 라이브러리를 다운로드합니다.
+3. **서버 설정**: Servers 탭에서 Apache Tomcat 11.0을 추가하고 프로젝트를 Add 합니다.
+4. **실행**: src/main/webapp/index.html 파일을 우클릭하여 Run on Server를 실행합니다.
+5. **로그 확인**: 글을 작성하거나 페이지를 이동할 때마다 STS 콘솔창에 출력되는 PerformanceFilter의 응답 시간(ms) 로그를 확인해 보세요.
