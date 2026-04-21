@@ -35,17 +35,33 @@ Servlet, JSP, Session, Cookie, JSTL/EL, Filter 등 백엔드 기술을 집약하
 
 ## 🏗 Project Architecture (패키지 구조)
 ```text
-src/main/java
-├── com.test.db        # 메모리 DB (MockDB.java)
-├── com.test.dto        # 데이터 전송 객체 (Member, Board)
-├── com.test.filter     # 전역 인코딩 필터 (UTF-8)
-└── com.test.servlet    # 기능별 서블릿 (Login, Logout, BoardList, Write, Delete)
-
-src/main/webapp
-├── index.html          # 실습 가이드 메인 페이지
-├── login.jsp           # 로그인 및 쿠키 확인 화면
-├── board.jsp           # 게시판 목록 (JSTL/EL 적용)
-└── boardWrite.jsp      # 새 글 작성 화면
+BackendMaster
+├── src/main/java
+│   ├── com.test.db
+│   │   └── MockDB.java            # Model: 가상 DB 및 초기 데이터 세팅
+│   ├── com.test.dto
+│   │   ├── Member.java            # Model: 회원 정보 데이터 객체
+│   │   └── Board.java             # Model: 게시글 정보 데이터 객체
+│   ├── com.test.filter
+│   │   ├── EncodingFilter.java    # Filter: 전역 UTF-8 인코딩 처리
+│   │   ├── LoginCheckFilter.java  # Filter: 로그인 세션 유무 검증 (보안)
+│   │   └── PerformanceFilter.java # Filter: 응답 속도 측정 및 모니터링
+│   └── com.test.servlet
+│       ├── LoginServlet.java      # Controller: 로그인 처리 및 쿠키 생성
+│       ├── LogoutServlet.java     # Controller: 세션 파기 및 로그아웃
+│       ├── BoardListServlet.java  # Controller: 게시글 목록 조회 및 가상 번호 로직
+│       ├── BoardWriteServlet.java # Controller: 새 글 등록 (Redirect 적용)
+│       └── BoardDeleteServlet.java# Controller: 게시글 삭제 처리
+│
+├── src/main/webapp
+│   ├── index.html                 # View: 프로젝트 메인 대시보드 및 실습 가이드
+│   ├── login.jsp                  # View: 로그인 입력 및 에러 메시지 출력
+│   ├── board.jsp                  # View: 게시판 목록 및 JSTL/EL 기반 렌더링
+│   ├── boardWrite.jsp             # View: 글쓰기 입력 폼
+│   └── WEB-INF
+│       └── web.xml                # Deployment Descriptor (서버 설정)
+│
+└── pom.xml                        # Maven: 라이브러리(Servlet, JSTL) 의존성 관리
 ```
 ## 🚀 실행 방법 (How to Run)
 
