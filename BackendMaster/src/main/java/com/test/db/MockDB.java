@@ -2,13 +2,17 @@ package com.test.db;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import com.test.dto.Board;
+import com.test.dto.Comment;
 import com.test.dto.Member;
 
 public class MockDB {
     public static Map<String, Member> memberTable = new HashMap<>();
     public static Map<Integer, Board> boardTable = new HashMap<>();
+    public static Map<Integer, Comment> commentTable = new HashMap<>();
     public static int boardSeq = 1; // 게시글 번호 자동 증가용 변수
+    public static int commentSeq = 1;
 
     static {
         // 1. 회원 더미 데이터 세팅 (유저 5명 + 관리자 1명)
@@ -98,5 +102,8 @@ public class MockDB {
             "이번 주 금요일 디스코드 스터디 모임 시간이 저녁 7시에서 8시로 1시간 미뤄졌습니다.\n\n" +
             "참고하셔서 늦지 않게 접속해 주세요! 다들 화이팅입니다 💪", 
             "user01"));
+        
+        commentTable.put(commentSeq, new Comment(commentSeq++, 7, "user04", "저도 필터 쪽 오니까 머리가 아프네요 ㅠㅠ 같이 화이팅해요!"));
+        commentTable.put(commentSeq, new Comment(commentSeq++, 7, "admin", "어려운 부분은 언제든 스터디 시간에 질문해 주세요 ^^"));
     }
 }
