@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
 <!DOCTYPE html>
@@ -9,325 +10,356 @@
 <style>
 /* 1. 기본 테마 및 폰트 */
 body {
-    font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
-    background-color: #fff5e6; /* 따뜻한 크림색 */
-    padding: 40px 20px;
-    margin: 0;
-    color: #4a3a3a;
+	font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+	background-color: #fff5e6; /* 따뜻한 크림색 */
+	padding: 40px 20px;
+	margin: 0;
+	color: #4a3a3a;
 }
 
 /* 2. 메인 컨테이너 (유리창 효과) */
 .main-container {
-    max-width: 950px;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(10px);
-    padding: 40px;
-    border-radius: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+	max-width: 950px;
+	margin: 0 auto;
+	background: rgba(255, 255, 255, 0.85);
+	backdrop-filter: blur(10px);
+	padding: 40px;
+	border-radius: 25px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 /* 3. 헤더 영역 */
 .header-box {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
 }
 
 .header-box h2 {
-    margin: 0;
-    color: #5d4037;
-    font-size: 1.8em;
+	margin: 0;
+	color: #5d4037;
+	font-size: 1.8em;
 }
 
 /* 4. 카테고리 탭 디자인 */
 .category-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
+	display: flex;
+	gap: 10px;
+	margin-bottom: 25px;
 }
 
 .tab-btn {
-    padding: 8px 18px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-size: 0.95em;
-    font-weight: bold;
-    transition: 0.2s;
+	padding: 8px 18px;
+	border-radius: 20px;
+	text-decoration: none;
+	font-size: 0.95em;
+	font-weight: bold;
+	transition: 0.2s;
 }
 
 /* 활성화된 탭과 일반 탭 구분 */
-.tab-active { background: #ff7f50; color: white; }
-.tab-inactive { background: #ffefdb; color: #8d6e63; }
-.tab-inactive:hover { background: #ffdcb0; }
+.tab-active {
+	background: #ff7f50;
+	color: white;
+}
+
+.tab-inactive {
+	background: #ffefdb;
+	color: #8d6e63;
+}
+
+.tab-inactive:hover {
+	background: #ffdcb0;
+}
 
 /* 5. 버튼 스타일 */
 .write-btn {
-    display: inline-block;
-    margin-top: 5px;
-    margin-bottom: 20px;
-    padding: 10px 22px;
-    background-color: #ff7f50;
-    color: white !important;
-    text-decoration: none;
-    border-radius: 12px;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(255, 127, 80, 0.2);
-    transition: 0.2s;
+	display: inline-block;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	padding: 10px 22px;
+	background-color: #ff7f50;
+	color: white !important;
+	text-decoration: none;
+	border-radius: 12px;
+	font-weight: bold;
+	box-shadow: 0 4px 10px rgba(255, 127, 80, 0.2);
+	transition: 0.2s;
 }
 
-.write-btn:hover { transform: translateY(-2px); background-color: #ff6b3d; }
+.write-btn:hover {
+	transform: translateY(-2px);
+	background-color: #ff6b3d;
+}
 
 .logout-btn {
-    padding: 7px 14px;
-    background-color: #e0aca2; /* 더스티 로즈 */
-    color: white !important;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 0.85em;
-    font-weight: bold;
+	padding: 7px 14px;
+	background-color: #e0aca2; /* 더스티 로즈 */
+	color: white !important;
+	text-decoration: none;
+	border-radius: 8px;
+	font-size: 0.85em;
+	font-weight: bold;
 }
 
-.logout-btn:hover { background-color: #d1968a; }
+.logout-btn:hover {
+	background-color: #d1968a;
+}
 
 /* 6. 테이블 디자인 */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    border: none;
+	width: 100%;
+	border-collapse: collapse;
+	border: none;
 }
 
 th {
-    border-bottom: 2px solid #ff7f50;
-    color: #8d6e63;
-    padding: 15px;
-    font-size: 0.95em;
+	border-bottom: 2px solid #ff7f50;
+	color: #8d6e63;
+	padding: 15px;
+	font-size: 0.95em;
 }
 
 td {
-    padding: 18px 15px;
-    border-bottom: 1px solid #f5eee6;
-    color: #555;
+	padding: 18px 15px;
+	border-bottom: 1px solid #f5eee6;
+	color: #555;
 }
 
 /* 카테고리 뱃지 */
 .cat-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    background: #f1f3f5;
-    border-radius: 8px;
-    font-size: 0.85em;
-    color: #777;
-    font-weight: 600;
+	display: inline-block;
+	padding: 4px 10px;
+	background: #f1f3f5;
+	border-radius: 8px;
+	font-size: 0.85em;
+	color: #777;
+	font-weight: 600;
 }
 
 .title-link {
-    text-decoration: none;
-    color: #5d4037;
-    font-weight: 600;
-    transition: 0.2s;
+	text-decoration: none;
+	color: #5d4037;
+	font-weight: 600;
+	transition: 0.2s;
 }
 
-.title-link:hover { color: #ff7f50; text-decoration: underline; }
+.title-link:hover {
+	color: #ff7f50;
+	text-decoration: underline;
+}
 
 .delete-link {
-    color: #c97373 !important; /* 부드러운 레드 */
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.9em;
+	color: #c97373 !important; /* 부드러운 레드 */
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 0.9em;
 }
 
-.delete-link:hover { color: #a64d4d !important; text-decoration: underline; }
+.delete-link:hover {
+	color: #a64d4d !important;
+	text-decoration: underline;
+}
 
-.auth-label { color: #bbb; font-size: 0.85em; }
+.auth-label {
+	color: #bbb;
+	font-size: 0.85em;
+}
 
-tr:hover { background-color: rgba(255, 127, 80, 0.02); }
+tr:hover {
+	background-color: rgba(255, 127, 80, 0.02);
+}
 </style>
 </head>
 <body>
 
-<div class="main-container">
-    <%-- 로그인 방어막 --%>
-    <c:if test="${empty sessionScope.loginUser}">
-        <script>
-            alert("로그인이 필요한 서비스입니다.");
-            location.href = "login.jsp";
-        </script>
-    </c:if>
+	<div class="main-container">
+		<%-- 로그인 방어막 --%>
+		<c:if test="${empty sessionScope.loginUser}">
+			<script>
+				alert("로그인이 필요한 서비스입니다.");
+				location.href = "login.jsp";
+			</script>
+		</c:if>
 
-    <c:if test="${not empty sessionScope.loginUser}">
-        <%-- 상단 헤더 영역 --%>
-        <div class="header-box">
-            <h2>📝 Backend Master 스터디</h2>
-            <div>
-                <span style="font-size: 0.95em; margin-right: 10px;">
-                    <b>${sessionScope.loginUser.name}</b>님, 안녕하세요!
-                </span> 
-                <a href="LogoutServlet" class="logout-btn">로그아웃</a>
-            </div>
-        </div>
+		<c:if test="${not empty sessionScope.loginUser}">
+			<%-- 상단 헤더 영역 --%>
+			<div class="header-box">
+				<h2>📝 Backend Master 스터디</h2>
+				<div>
+					<span style="font-size: 0.95em; margin-right: 10px;"> <b>${sessionScope.loginUser.name}</b>님,
+						안녕하세요!
+					</span> <a href="LogoutServlet" class="logout-btn">로그아웃</a>
+				</div>
+			</div>
 
-        <%-- 카테고리 필터링 탭 --%>
-        <div class="category-tabs">
-            <a href="BoardListServlet?category=전체" 
-               class="tab-btn ${currentCategory == '전체' || empty currentCategory ? 'tab-active' : 'tab-inactive'}">전체보기</a>
-            <a href="BoardListServlet?category=공지" 
-               class="tab-btn ${currentCategory == '공지' ? 'tab-active' : 'tab-inactive'}">📢 공지사항</a>
-            <a href="BoardListServlet?category=학습" 
-               class="tab-btn ${currentCategory == '학습' ? 'tab-active' : 'tab-inactive'}">📚 학습기록</a>
-            <a href="BoardListServlet?category=자유" 
-               class="tab-btn ${currentCategory == '자유' ? 'tab-active' : 'tab-inactive'}">💬 자유게시판</a>
-        </div>
+			<%-- 카테고리 필터링 탭 --%>
+			<div class="category-tabs">
+				<a href="BoardListServlet?category=전체"
+					class="tab-btn ${currentCategory == '전체' || empty currentCategory ? 'tab-active' : 'tab-inactive'}">전체보기</a>
+				<a href="BoardListServlet?category=공지"
+					class="tab-btn ${currentCategory == '공지' ? 'tab-active' : 'tab-inactive'}">📢
+					공지사항</a> <a href="BoardListServlet?category=학습"
+					class="tab-btn ${currentCategory == '학습' ? 'tab-active' : 'tab-inactive'}">📚
+					학습기록</a> <a href="BoardListServlet?category=자유"
+					class="tab-btn ${currentCategory == '자유' ? 'tab-active' : 'tab-inactive'}">💬
+					자유게시판</a>
+			</div>
 
-        <%-- 액션 버튼 영역 --%>
-        <div style="display: flex; justify-content: flex-end;">
-            <a href="boardWrite.jsp" class="write-btn">+ 새 글 작성하기</a>
-        </div>
-        
-        <%-- ================= 🔍 검색 영역 시작 ================= --%>
-        <div class="search-container" style="background: rgba(255,255,255,0.6); padding: 15px 25px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: flex-end; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-            <form action="BoardListServlet" method="get" style="display: flex; gap: 10px; width: 100%; max-width: 500px;">
-                <%-- 현재 카테고리 탭을 유지하면서 검색하기 위한 hidden 값 --%>
-                <input type="hidden" name="category" value="${param.category != null ? param.category : '전체'}">
-                
-                <select name="searchType" style="padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; outline: none; color: #555;">
-                    <option value="title" ${param.searchType == 'title' ? 'selected' : ''}>제목</option>
-                    <option value="content" ${param.searchType == 'content' ? 'selected' : ''}>내용</option>
-                    <option value="author" ${param.searchType == 'author' ? 'selected' : ''}>작성자</option>
-                </select>
-                
-                <input type="text" name="keyword" value="${param.keyword}" placeholder="검색어를 입력하세요" 
-                       style="flex-grow: 1; padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 8px; outline: none;">
-                
-                <button type="submit" style="padding: 10px 20px; background-color: #8d6e63; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;">
-                    검색
-                </button>
-            </form>
-        </div>
-        <%-- ================= 🔍 검색 영역 끝 ================= --%>
+			<%-- 액션 버튼 영역 --%>
+			<div style="display: flex; justify-content: flex-end;">
+				<a href="boardWrite.jsp" class="write-btn">+ 새 글 작성하기</a>
+			</div>
 
-        <%-- 게시판 테이블 --%>
-        <table>
-            <thead>
-                <tr>
-                    <th width="8%">번호</th>
-                    <th width="12%">분류</th>
-                    <th width="45%">제목</th>
-                    <th width="15%">작성자</th>
-                    <th width="10%">관리</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:choose>
-                    <c:when test="${empty requestScope.boardList}">
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 100px 0; color: #999;">
-                                선택하신 카테고리에 등록된 글이 없습니다.<br>첫 번째 이야기의 주인공이 되어보세요!
-                            </td>
-                        </tr>
-                    </c:when>
+			<%-- ================= 🔍 검색 영역 시작 ================= --%>
+			<div class="search-container"
+				style="background: rgba(255, 255, 255, 0.6); padding: 15px 25px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: flex-end; align-items: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);">
+				<form action="BoardListServlet" method="get"
+					style="display: flex; gap: 10px; width: 100%; max-width: 500px;">
+					<input type="hidden" name="category"
+						value="${param.category != null ? param.category : '전체'}">
 
-                    <c:otherwise>
-                        <%-- 📌 1. 현재 화면에 띄울 리스트 중 '공지'의 개수를 미리 셉니다. --%>
-                        <c:set var="noticeCount" value="0" />
-                        <c:forEach var="item" items="${requestScope.boardList}">
-                            <c:if test="${item.category == '공지'}">
-                                <c:set var="noticeCount" value="${noticeCount + 1}" />
-                            </c:if>
-                        </c:forEach>
-                        
-                        <%-- 📌 2. 일반 글의 시작 번호 계산 (전체 개수 - 공지 개수) --%>
-                        <c:set var="normalMaxNum" value="${requestScope.boardList.size() - noticeCount}" />
-                        
-                        <%-- 📌 3. 일반 글이 출력될 때마다 1씩 줄여나갈 카운터 변수 --%>
-                        <c:set var="currentNormalNum" value="${normalMaxNum}" />
+					<select name="searchType"
+						style="padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; outline: none; color: #555;">
+						<option value="title"
+							${param.searchType == 'title' ? 'selected' : ''}>제목</option>
+						<option value="content"
+							${param.searchType == 'content' ? 'selected' : ''}>내용</option>
+						<option value="author"
+							${param.searchType == 'author' ? 'selected' : ''}>작성자</option>
+					</select> <input type="text" name="keyword" value="${param.keyword}"
+						placeholder="검색어를 입력하세요"
+						style="flex-grow: 1; padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 8px; outline: none;">
 
-                        <c:forEach var="board" items="${requestScope.boardList}" varStatus="status">
-                            <tr style="${board.category == '공지' ? 'background-color: #fff0e6;' : ''}">
-                                
-                                <%-- 번호 칸 출력 로직 --%>
-                                <td style="text-align: center; color: #bbb;">
-                                    <c:choose>
-                                        <c:when test="${board.category == '공지'}">
-                                            <span style="font-size: 1.2em;" title="고정된 공지사항">📌</span>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <%-- 일반 글이면 현재 번호를 출력하고, 번호를 1 줄임 --%>
-                                            <c:out value="${currentNormalNum}" />
-                                            <c:set var="currentNormalNum" value="${currentNormalNum - 1}" />
-                                        </c:otherwise>
-                                    </c:choose>
-                                </td>
-                                
-                                <td style="text-align: center;">
-                                    <span class="cat-badge" style="${board.category == '공지' ? 'background-color: #ff7f50; color: white;' : ''}">
-                                        <c:out value="${board.category}" />
-                                    </span>
-                                </td>
+					<button type="submit"
+						style="padding: 10px 20px; background-color: #8d6e63; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;">
+						검색</button>
+				</form>
+			</div>
+			<%-- ================= 🔍 검색 영역 끝 ================= --%>
 
-                                <td style="text-align: left;">
-                                    <a href="BoardDetailServlet?id=${board.id}" class="title-link">
-                                        <c:out value="${board.title}" />
-                                    </a>
-                                </td>
+			<%-- 게시판 테이블 --%>
+			<table>
+				<thead>
+					<tr>
+						<th width="8%">번호</th>
+						<th width="12%">분류</th>
+						<th width="45%">제목</th>
+						<th width="15%">작성자</th>
+						<th width="10%">관리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:choose>
+						<%-- 공지사항도 없고 일반 게시글도 없을 때 --%>
+						<c:when
+							test="${empty requestScope.noticeList && empty requestScope.boardList}">
+							<tr>
+								<td colspan="5"
+									style="text-align: center; padding: 100px 0; color: #999;">
+									선택하신 카테고리에 등록된 글이 없습니다.<br>첫 번째 이야기의 주인공이 되어보세요!
+								</td>
+							</tr>
+						</c:when>
 
-                                <td style="text-align: center; font-weight: 500;">
-                                    <c:out value="${board.authorId}" />
-                                </td>
+						<c:otherwise>
+							<%-- 🚀 1. 공지사항 렌더링 (항상 상단에 핀 고정) --%>
+							<c:forEach var="notice" items="${requestScope.noticeList}">
+								<tr style="background-color: #fff0e6;">
+									<td style="text-align: center; color: #bbb;"><span
+										style="font-size: 1.2em;" title="고정된 공지사항">📌</span></td>
+									<td style="text-align: center;"><span class="cat-badge"
+										style="background-color: #ff7f50; color: white;"> <c:out
+												value="${notice.category}" />
+									</span></td>
+									<td style="text-align: left;"><a
+										href="BoardDetailServlet?id=${notice.id}" class="title-link">
+											<c:out value="${notice.title}" />
+									</a></td>
+									<td style="text-align: center; font-weight: 500;"><c:out
+											value="${notice.authorId}" /></td>
+									<td style="text-align: center;"><c:choose>
+											<c:when
+												test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == notice.authorId}">
+												<a href="BoardDeleteServlet?id=${notice.id}"
+													class="delete-link"
+													onclick="return confirm('이 글을 정말 삭제하시겠습니까?');">[삭제]</a>
+											</c:when>
+											<c:otherwise>
+												<span class="auth-label">권한없음</span>
+											</c:otherwise>
+										</c:choose></td>
+								</tr>
+							</c:forEach>
 
-                                <td style="text-align: center;">
-                                    <c:choose>
-                                        <c:when test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == board.authorId}">
-                                            <a href="BoardDeleteServlet?id=${board.id}" 
-                                               class="delete-link"
-                                               onclick="return confirm('이 글을 정말 삭제하시겠습니까?');">[삭제]</a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="auth-label">권한없음</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </c:otherwise>
-                </c:choose>
-            </tbody>
-        </table>
-        <%-- ================= 📄 페이징 영역 시작 ================= --%>
-        <div class="pagination" style="text-align: center; margin-top: 30px; margin-bottom: 50px;">
-            <%-- 검색 및 카테고리 유지를 위한 파라미터 묶음 생성 --%>
-            <c:set var="queryParams" value="&category=${param.category != null ? param.category : '전체'}&searchType=${param.searchType}&keyword=${param.keyword}" />
+							<%-- 🚀 2. 일반 게시글 렌더링 (가상 번호 공식 적용) --%>
+							<c:forEach var="board" items="${requestScope.boardList}"
+								varStatus="status">
+								<tr>
+									<td style="text-align: center; color: #bbb;">
+										<%-- 실무형 가상 번호 공식: 전체 글 수 - ((현재페이지 - 1) * 페이지당개수) - 현재 루프 인덱스 --%>
+										${totalPosts - ((currentPage - 1) * 10) - status.index}
+									</td>
+									<td style="text-align: center;"><span class="cat-badge">
+											<c:out value="${board.category}" />
+									</span></td>
+									<td style="text-align: left;"><a
+										href="BoardDetailServlet?id=${board.id}" class="title-link">
+											<c:out value="${board.title}" />
+									</a></td>
+									<td style="text-align: center; font-weight: 500;"><c:out
+											value="${board.authorId}" /></td>
+									<td style="text-align: center;"><c:choose>
+											<c:when
+												test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == board.authorId}">
+												<a href="BoardDeleteServlet?id=${board.id}"
+													class="delete-link"
+													onclick="return confirm('이 글을 정말 삭제하시겠습니까?');">[삭제]</a>
+											</c:when>
+											<c:otherwise>
+												<span class="auth-label">권한없음</span>
+											</c:otherwise>
+										</c:choose></td>
+								</tr>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
+				</tbody>
+			</table>
 
-            <%-- [이전] 버튼: 시작 페이지가 1보다 클 때만 (즉, 6, 11, 16... 일 때) --%>
-            <c:if test="${startPage > 1}">
-                <a href="BoardListServlet?page=${startPage - 1}${queryParams}" 
-                   style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">이전</a>
-            </c:if>
+			<%-- ================= 📄 페이징 영역 시작 ================= --%>
+			<div class="pagination"
+				style="text-align: center; margin-top: 30px; margin-bottom: 50px;">
+				<c:set var="queryParams"
+					value="&category=${param.category != null ? param.category : '전체'}&searchType=${param.searchType}&keyword=${param.keyword}" />
 
-            <%-- [1] [2] [3] [4] [5] 페이지 번호 출력 --%>
-            <c:forEach begin="${startPage}" end="${endPage}" var="p">
-                <c:choose>
-                    <c:when test="${p == currentPage}">
-                        <%-- 현재 페이지는 코랄색으로 강조 --%>
-                        <b style="padding: 8px 12px; background-color: #ff7f50; color: white; border-radius: 8px; margin: 0 2px; display: inline-block;">${p}</b>
-                    </c:when>
-                    <c:otherwise>
-                        <a href="BoardListServlet?page=${p}${queryParams}" 
-                           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">${p}</a>
-                    </c:otherwise>
-                </c:choose>
-            </c:forEach>
+				<c:if test="${startPage > 1}">
+					<a href="BoardListServlet?page=${startPage - 1}${queryParams}"
+						style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">이전</a>
+				</c:if>
 
-            <%-- [다음] 버튼: 끝 페이지가 총 페이지 수보다 작을 때만 --%>
-            <c:if test="${endPage < totalPages}">
-                <a href="BoardListServlet?page=${endPage + 1}${queryParams}" 
-                   style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">다음</a>
-            </c:if>
-        </div>
-        <%-- ================= 📄 페이징 영역 끝 ================= --%>
-    </c:if>
-</div>
+				<c:forEach begin="${startPage}" end="${endPage}" var="p">
+					<c:choose>
+						<c:when test="${p == currentPage}">
+							<b
+								style="padding: 8px 12px; background-color: #ff7f50; color: white; border-radius: 8px; margin: 0 2px; display: inline-block;">${p}</b>
+						</c:when>
+						<c:otherwise>
+							<a href="BoardListServlet?page=${p}${queryParams}"
+								style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">${p}</a>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+
+				<c:if test="${endPage < totalPages}">
+					<a href="BoardListServlet?page=${endPage + 1}${queryParams}"
+						style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #555; margin: 0 2px;">다음</a>
+				</c:if>
+			</div>
+			<%-- ================= 📄 페이징 영역 끝 ================= --%>
+		</c:if>
+	</div>
 
 </body>
 </html>

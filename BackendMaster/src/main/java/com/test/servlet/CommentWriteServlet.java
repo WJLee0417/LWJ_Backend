@@ -1,16 +1,17 @@
 package com.test.servlet;
 
+import java.io.IOException;
+
+import com.test.dao.CommentDAO;
+import com.test.dto.Comment;
+import com.test.dto.Member;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-
-import com.test.db.MockDB;
-import com.test.dto.Comment;
-import com.test.dto.Member;
 
 @WebServlet("/CommentWriteServlet")
 public class CommentWriteServlet extends HttpServlet {
@@ -26,11 +27,12 @@ public class CommentWriteServlet extends HttpServlet {
         Member loginUser = (Member) session.getAttribute("loginUser");
         String authorId = loginUser.getId();
 
-        // 3. 댓글 객체 생성 및 DB 저장
-        Comment newComment = new Comment(MockDB.commentSeq, boardId, authorId, content);
-        MockDB.commentTable.put(MockDB.commentSeq++, newComment);
+        // 🚀 [수정됨] MockDB 대신 CommentDAO를 통해 DB에 INSERT
+        CommentDAO dao = new CommentDAO();
+        // 0은 id 자리 (AUTO_INCREMENT이므로 0이나 임의의 값 넣음)
+        boolean isSuccess = dao.insertComment(new Comment(0, boardId, authorId, content));
 
-        // 4. 원래 보던 게시글 상세 페이지로 다시 리다이렉트 (PRG 패턴)
+        // 작성 후 원래 있던 게시글 상세 페이지로 리다이렉트
         response.sendRedirect("BoardDetailServlet?id=" + boardId);
     }
 }

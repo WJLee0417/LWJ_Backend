@@ -168,48 +168,64 @@
                 </div>
             </c:otherwise>
         </c:choose>
-    </div>
     
-    <div style="margin-top: 50px; border-top: 2px dashed #ffefdb; padding-top: 30px;">
-    	<h3 style="color: #8d6e63; font-size: 1.2em; margin-bottom: 20px;">💬 댓글 달기</h3>
     
-    	<%-- 1. 댓글 목록 출력 --%>
-    	<div style="margin-bottom: 30px;">
-        	<c:choose>
-            	<c:when test="${empty requestScope.commentList}">
-                	<div style="text-align: center; color: #aaa; padding: 20px; background: rgba(255,255,255,0.5); border-radius: 12px;">
-                    	아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!
-                	</div>
-            	</c:when>
-            	<c:otherwise>
-                	<c:forEach var="comment" items="${requestScope.commentList}">
-                    	<div style="background: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-                        	<div style="font-weight: bold; color: #5d4037; font-size: 0.9em; margin-bottom: 5px;">
-                            	${comment.authorId}
-                        	</div>
-                        	<div style="color: #555; line-height: 1.5;">
-                            	<c:out value="${comment.content}" />
-                        	</div>
+        <%-- ================================================================= --%>
+        <%-- 💬 댓글 영역 시작                                                   --%>
+        <%-- ================================================================= --%>
+        <div style="margin-top: 50px; border-top: 2px dashed #ffefdb; padding-top: 30px;">
+        	<h3 style="color: #8d6e63; font-size: 1.2em; margin-bottom: 20px;">💬 댓글 달기</h3>
+        
+        	<%-- 1. 댓글 목록 출력 --%>
+        	<div style="margin-bottom: 30px;">
+            	<c:choose>
+                	<c:when test="${empty requestScope.commentList}">
+                    	<div style="text-align: center; color: #aaa; padding: 20px; background: rgba(255,255,255,0.5); border-radius: 12px;">
+                        	아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!
                     	</div>
-                	</c:forEach>
-            	</c:otherwise>
-        	</c:choose>
-    	</div>
+                	</c:when>
+                	<c:otherwise>
+                    	<c:forEach var="comment" items="${requestScope.commentList}">
+                        	<div style="background: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                            	
+                            	<%-- 🚀 수정된 부분: 작성자 ID와 삭제 버튼을 양쪽으로 배치 --%>
+                            	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                	<div style="font-weight: bold; color: #5d4037; font-size: 0.9em;">
+                                    	${comment.authorId}
+                                	</div>
+                                	
+                                	<%-- 본인 또는 관리자만 댓글 삭제 가능 --%>
+                                	<c:if test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == comment.authorId}">
+                                        <a href="CommentDeleteServlet?id=${comment.id}&boardId=${board.id}" 
+                                           style="color: #c97373; text-decoration: none; font-size: 0.85em; font-weight: bold;"
+                                           onclick="return confirm('이 댓글을 삭제하시겠습니까?');">[삭제]</a>
+                                    </c:if>
+                            	</div>
 
-    	<%-- 2. 댓글 작성 폼 --%>
-    	<form action="CommentWriteServlet" method="post" style="display: flex; gap: 10px;">
-        	<%-- 어떤 게시글의 댓글인지 서블릿에 알려주기 위한 숨김 데이터 --%>
-        	<input type="hidden" name="boardId" value="${board.id}">
-        
-        	<input type="text" name="content" placeholder="따뜻한 댓글을 남겨주세요." required autocomplete="off"
-               	style="flex-grow: 1; padding: 12px 20px; border: 1px solid #e0e0e0; border-radius: 12px; outline: none; font-family: inherit;">
-        
-        	<button type="submit" 
-                style="padding: 12px 25px; background: #ff7f50; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;">
-            	등록
-        	</button>
-    	</form>
-	</div>
+                            	<div style="color: #555; line-height: 1.5;">
+                                	<c:out value="${comment.content}" />
+                            	</div>
+                        	</div>
+                    	</c:forEach>
+                	</c:otherwise>
+            	</c:choose>
+        	</div>
+
+        	<%-- 2. 댓글 작성 폼 --%>
+        	<form action="CommentWriteServlet" method="post" style="display: flex; gap: 10px;">
+            	<%-- 어떤 게시글의 댓글인지 서블릿에 알려주기 위한 숨김 데이터 --%>
+            	<input type="hidden" name="boardId" value="${board.id}">
+            
+            	<input type="text" name="content" placeholder="따뜻한 댓글을 남겨주세요." required autocomplete="off"
+                   	style="flex-grow: 1; padding: 12px 20px; border: 1px solid #e0e0e0; border-radius: 12px; outline: none; font-family: inherit;">
+            
+            	<button type="submit" 
+                    style="padding: 12px 25px; background: #ff7f50; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;">
+                	등록
+            	</button>
+        	</form>
+    	</div>
+    </div>
 
 </body>
 </html>
