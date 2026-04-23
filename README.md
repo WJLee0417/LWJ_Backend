@@ -1,39 +1,19 @@
-# 🚀 BackendMaster: Comprehensive Study Board
+# 🚀 BackendMaster: Full-Stack SQL Study Board
 
-**Servlet, JSP, Filter, Session & Cookie**를 총망라한 MVC 기반의 통합 웹 프로젝트입니다. 단순한 게시판을 넘어 **데이터 암호화, 검색 엔진, 페이징 알고리즘** 등 백엔드 개발의 필수 역량을 실제 코드로 구현한 "감성 스터디 게시판"입니다.
+**자바 서블릿(Servlet)과 JSP를 기반으로, 데이터 설계부터 보안 암호화까지 백엔드의 전체 생명주기를 구현한 통합 웹 프로젝트입니다.**
 
----
-
-## 🎨 Design Concept: Soft & Friendly
-- **Palette**: 따뜻한 크림 베이스(`#fff5e6`)와 활기찬 코랄 포인트(`#ff7f50`).
-- **UI/UX**: Glassmorphism 기반의 반투명 카드 레이아웃과 Soft UI(곡률 12~25px) 적용.
+단순한 CRUD를 넘어, 메모리 기반 가상 DB(`MockDB`)에서 실제 관계형 데이터베이스(`MySQL`)로의 **아키텍처 마이그레이션** 과정을 직접 수행하며 데이터 무결성과 비즈니스 로직의 분리를 심도 있게 학습했습니다.
 
 ---
 
-## 👥 스터디 그룹 및 테스트 계정
-| 역할 | ID | PW | 닉네임 | 비고 |
-| :--- | :--- | :--- | :--- | :--- |
-| **관리자** | `admin` | `1234` | 관리자 | 공지사항 관리 및 전체 삭제 권한 |
-| **멤버 1** | `user01` | `1111` | 백엔드초보 | 115개의 페이징 테스트 데이터 소유 |
-| **멤버 2** | `user02` | `2222` | JSP마스터 | |
+## 🛠 Tech Stack (기술 스택)
 
----
-
-## 🌟 주요 기능 (Key Features)
-
-### 1. 지능형 검색 및 페이징 (Search & Pagination)
-- **멀티 조건 검색**: 제목, 내용, 작성자를 기준으로 한 `LIKE` 스타일의 문자열 포함 검색 구현.
-- **슬라이싱 페이징**: 100개 이상의 데이터를 10개 단위로 정밀하게 절삭하는 `subList` 기반 페이징 알고리즘 적용.
-- **상태 유지 네비게이션**: 페이지 번호를 클릭하거나 카테고리를 변경해도 검색어와 탭 정보가 유지되도록 파라미터 바인딩 처리.
-
-### 2. 강력한 보안 시스템 (Security & Encryption)
-- **SHA-256 단방향 암호화**: `MessageDigest`를 활용해 사용자 비밀번호를 복구 불가능한 해시값으로 변환하여 저장.
-- **보안 필터링**: `LoginCheckFilter`를 통해 미인증 유저의 게시판 접근을 차단하고, 서버 측 권한 검증 로직으로 타인의 글 수정을 물리적으로 방지.
-
-### 3. 고도화된 데이터 로직 (Advanced CRUD)
-- **1:N 데이터 매핑**: 게시글 ID를 외래키(FK)로 활용하여 게시글-댓글 간의 일대다 관계 구현.
-- **Notice Pinning**: 어떤 카테고리 탭에서도 공지사항은 항상 최상단에 📌 고정 및 하이라이트 처리.
-- **Full CRUD Cycle**: 글 작성, 상세 조회, 수정(Update), 삭제(Delete)의 완벽한 프로세스 구축.
+- **Backend**: Java 17, Jakarta EE 10 (Servlet 6.0, JSP 3.1)
+- **Database**: MySQL 8.0 (JDBC Connection Pool)
+- **Security**: SHA-256 단방향 해싱 (Password Encryption)
+- **Build Tool**: Maven
+- **Server**: Apache Tomcat 11.0
+- **Frontend**: JSTL 3.0, EL (Expression Language), CSS3 (Soft UI Design)
 
 ---
 
@@ -42,54 +22,74 @@
 MVC 패턴과 1:N 관계형 데이터 구조를 반영한 최종 디렉토리 구조입니다.
 
 ```text
-BackendMaster
+BackendMaster (Maven Project)
 ├── src/main/java
-│   ├── com.test.db
-│   │   └── MockDB.java            # Model: 가상 DB (Hashed User, Board, Comment)
-│   ├── com.test.dto
-│   │   ├── Member.java            # DTO: 회원 정보 (Setter/Getter)
-│   │   ├── Board.java             # DTO: 게시글 정보 (Category 포함)
-│   │   └── Comment.java           # DTO: 댓글 정보 (boardId 매핑)
-│   ├── com.test.util
-│   │   └── PasswordUtil.java      # Util: SHA-256 해싱 엔진
-│   ├── com.test.filter
-│   │   ├── EncodingFilter.java    # Filter: UTF-8 전역 인코딩
-│   │   └── LoginCheckFilter.java  # Filter: 보안 인증 제어
-│   └── com.test.servlet
-│       ├── BoardListServlet.java  # Controller: 검색/페이징/정렬 핵심 로직
-│       ├── BoardUpdateServlet.java# Controller: 수정 폼 로드 및 데이터 갱신
-│       ├── CommentWriteServlet.java# Controller: 댓글 저장 및 리다이렉트
-│       └── ... (Join, Login, Logout, Detail, Delete)
+│   ├── com.test.dao           # Data Access Object: 진짜 DB(MySQL)와 대화하는 창구
+│   │   ├── MemberDAO.java     # 회원 가입/조회 쿼리 실행
+│   │   ├── BoardDAO.java      # 게시글 CRUD, 검색, 페이징, 공지사항 투트랙 로직
+│   │   └── CommentDAO.java    # 특정 게시글별 댓글 조회 및 삭제
+│   ├── com.test.dto           # Data Transfer Object: 데이터를 실어나르는 바구니
+│   │   ├── Member.java        # 사용자 정보 객체
+│   │   ├── Board.java         # 게시글 정보 객체
+│   │   └── Comment.java       # 댓글 정보 객체
+│   ├── com.test.util          # Utility: 공통 도구함
+│   │   ├── DBUtil.java        # MySQL Connection 연결 관리
+│   │   └── PasswordUtil.java  # SHA-256 단방향 암호화 엔진
+│   ├── com.test.filter        # Filter: 전처리/후처리 감시자
+│   │   ├── EncodingFilter.java    # 전역 UTF-8 인코딩 처리
+│   │   └── LoginCheckFilter.java  # 게시판 접근 보안 인증 제어
+│   ├── com.test.servlet       # Controller: 비즈니스 로직 제어 (Servlet 6.0)
+│   │   ├── BoardListServlet.java  # 검색/페이징/공지사항 투트랙 데이터 로드
+│   │   ├── BoardDetailServlet.java# 본문 + 해당 글의 댓글 동시 로드
+│   │   └── ... (Join, Login, Logout, Update, Delete, CommentWrite/Delete)
+│   └── com.test.db (Deprecated)# Legacy: 초기 빌드업용 가상 DB (흔적 보존용)
 │
-└── src/main/webapp
-    ├── index.html                 # View: 프로젝트 메인 대시보드
-    ├── board.jsp                  # View: 검색창 및 페이징 네비게이션 포함 목록
-    ├── boardUpdate.jsp            # View: 기존 데이터가 로드된 수정 폼
-    └── boardDetail.jsp            # View: 본문 및 댓글 시스템 통합 페이지
+└── src/main/webapp            # View & Resources
+    ├── resources/             # 정적 파일 (CSS, Images, JS)
+    ├── board.jsp              # 게시판 목록 (공지 고정 + 가상 번호 적용)
+    ├── boardDetail.jsp        # 게시글 상세보기 (댓글 관리 시스템 통합)
+    ├── boardUpdate.jsp        # 수정 폼
+    ├── join.jsp / login.jsp   # 회원가입 및 로그인 인터페이스
+    ├── index.html             # 메인 대시보드
+    └── WEB-INF/web.xml        # Deployment Descriptor (Filter 설정 등)
 ```
 
 ---
 
-## 🛠 Tech Stack (기술 스택)
+## 🌟 핵심 구현 성과 (Technical Highlights)
 
-프로젝트에 사용된 주요 기술 및 개발 환경 사양입니다.
+### 1. 지능형 데이터 로드 (Two-Track Fetching)
+- **공지사항 고정**: 모든 페이지에서 공지사항이 최상단에 고정되도록 공지사항 전용 쿼리와 일반 게시글 페이징 쿼리를 분리하여 처리하는 '투트랙 방식' 구현.
+- **고급 페이징**: SQL `LIMIT` 연산자를 활용하여 필요한 데이터만 부분 로드함으로써 서버 자원 최적화.
+- **가상 번호 공식**: 삭제로 인해 DB PK 이빨이 빠지는 문제를 해결하기 위해, 화면 렌더링 시 실무용 역순 가상 번호 계산 공식 적용.
 
-- **IDE**: Spring Tool Suite (STS) 5
-- **Language**: Java 17 (JDK 17 or higher)
-- **Servlet Spec**: Jakarta EE 10 (Servlet 6.0, JSP 3.1)
-- **Web Server**: Apache Tomcat 11.0
-- **Build Tool**: Maven
-- **Libraries**: 
-  - JSTL 3.0 (Jakarta Standard Tag Library)
-  - Jakarta Servlet API
-- **Database**: MockDB (Java Collections 기반 In-Memory DB)
-- **Encryption**: SHA-256 (MessageDigest API)
+### 2. 강력한 보안 및 인증 (Security)
+- **비밀번호 암호화**: `MessageDigest` 클래스를 이용해 평문 비밀번호를 64자리 SHA-256 해시값으로 변환하여 DB 저장.
+- **전역 보안 필터**: `LoginCheckFilter`를 통해 미인증 사용자의 접근을 차단하고, 서버 측에서 작성자 본인 여부를 검증하여 무단 수정/삭제 방지.
+
+### 3. 관계형 데이터 설계 (RDBMS)
+- **1:N 데이터 매핑**: 게시글(`Board`)과 댓글(`Comment`) 간의 외래키(FK) 설계를 통해 일대다 관계 구축.
+- **연쇄 삭제(CASCADE)**: `ON DELETE CASCADE` 옵션을 적용하여 게시글 삭제 시 관련 댓글이 자동으로 삭제되는 데이터 무결성 보장.
+- **동적 검색**: 검색 조건(제목/내용/작성자)에 따라 SQL 문이 유연하게 변하는 동적 쿼리 로직 구현.
 
 ---
 
-## 🚦 실행 방법 (How to Run)
-1. **프로젝트 임포트**: STS에서 File -> Import -> Existing Maven Projects를 선택하여 프로젝트 폴더를 불러옵니다.
-2. **의존성 업데이트**: 프로젝트 우클릭 -> Maven -> Update Project (Shortcut: Alt+F5)를 클릭하여 필요한 라이브러리를 다운로드합니다.
-3. **서버 설정**: Servers 탭에서 Apache Tomcat 11.0을 추가하고 프로젝트를 Add 합니다.
-4. **실행**: src/main/webapp/index.html 파일을 우클릭하여 Run on Server를 실행합니다.
-5. **로그 확인**: 글을 작성하거나 페이지를 이동할 때마다 STS 콘솔창에 출력되는 PerformanceFilter의 응답 시간(ms) 로그를 확인해 보세요.
+---
+
+## 📂 아키텍처 진화 (Evolution)
+
+이 프로젝트는 단계적 빌드업을 통해 완성되었습니다.
+
+1.  **Phase 1 (MockDB)**: Java Collections(`HashMap`)를 활용한 메모리 기반 데이터 처리 로직 검증.
+2.  **Phase 2 (DAO Pattern)**: 비즈니스 로직과 데이터 접근 로직을 분리하는 DAO 패턴 도입.
+3.  **Phase 3 (SQL Integration)**: JDBC를 통한 MySQL 연동 및 데이터 마이그레이션 완료.
+    - *현재 `com.test.db.MockDB` 클래스는 빌드업 과정의 기록을 위해 `@Deprecated` 처리되어 보존 중입니다.*
+
+---
+
+## 🚦 시작하기 (Installation)
+
+1. MySQL에서 `backend_master` 스키마를 생성하고 제공된 DDL 스크립트를 실행합니다.
+2. `DBUtil.java` 파일에서 본인의 MySQL 계정 정보를 수정합니다.
+3. Maven `Update Project`를 실행하여 의존성을 설치합니다.
+4. Tomcat 11 서버를 통해 `index.html`을 구동합니다.
