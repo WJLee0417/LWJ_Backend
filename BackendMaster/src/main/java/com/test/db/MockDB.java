@@ -8,6 +8,7 @@ import com.test.dto.Comment;
 import com.test.dto.Member;
 import com.test.util.PasswordUtil;
 
+@Deprecated
 public class MockDB {
     public static Map<String, Member> memberTable = new HashMap<>();
     public static Map<Integer, Board> boardTable = new HashMap<>();
