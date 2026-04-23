@@ -2,7 +2,7 @@ package com.test.servlet;
 
 import java.io.IOException;
 
-import com.test.db.MockDB;
+import com.test.dao.MemberDAO;
 import com.test.dto.Member;
 import com.test.util.PasswordUtil;
 
@@ -24,10 +24,11 @@ public class LoginServlet extends HttpServlet {
         String rawPw = request.getParameter("pw");
         String remember = request.getParameter("remember"); 
 
-        // 2. MockDB에서 해당 아이디의 회원 정보 조회
-        Member member = MockDB.memberTable.get(id);
-        
-     // 🚀 사용자가 입력한 비밀번호도 똑같이 암호화
+        // 🚀 1. DAO 객체 생성 및 진짜 DB에서 회원 정보 조회
+        MemberDAO dao = new MemberDAO();
+        Member member = dao.getMemberById(id);
+
+        // 2. 사용자가 입력한 비밀번호 암호화
         String hashedInputPw = PasswordUtil.hashPassword(rawPw);
 
         // 3. 로그인 검증
