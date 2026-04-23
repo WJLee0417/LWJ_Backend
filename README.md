@@ -1,19 +1,19 @@
-# 🚀 BackendMaster: Full-Stack SQL Study Board
+# 🪜 Step-up Backend: Mock-to-SQL Migration Board
 
-**자바 서블릿(Servlet)과 JSP를 기반으로, 데이터 설계부터 보안 암호화까지 백엔드의 전체 생명주기를 구현한 통합 웹 프로젝트입니다.**
+**자바 서블릿(Servlet)과 JSP를 기반으로, 데이터 아키텍처의 진화 과정을 담은 풀스택 웹 게시판 프로젝트입니다.**
 
-단순한 CRUD를 넘어, 메모리 기반 가상 DB(`MockDB`)에서 실제 관계형 데이터베이스(`MySQL`)로의 **아키텍처 마이그레이션** 과정을 직접 수행하며 데이터 무결성과 비즈니스 로직의 분리를 심도 있게 학습했습니다.
+단순한 기능 구현을 넘어, 메모리 기반 `MockDB`에서 실제 `MySQL RDBMS`로의 **데이터 마이그레이션(Migration)**을 직접 수행하며 백엔드 시스템의 견고한 구조 설계를 학습하고 검증했습니다.
 
 ---
 
 ## 🛠 Tech Stack (기술 스택)
 
-- **Backend**: Java 17, Jakarta EE 10 (Servlet 6.0, JSP 3.1)
-- **Database**: MySQL 8.0 (JDBC Connection Pool)
-- **Security**: SHA-256 단방향 해싱 (Password Encryption)
+- **Language & Framework**: Java 17, Jakarta EE 10 (Servlet 6.0, JSP 3.1)
+- **Database**: MySQL 8.0 (JDBC Connection)
+- **Security**: SHA-256 One-way Hashing (Password Encryption)
 - **Build Tool**: Maven
 - **Server**: Apache Tomcat 11.0
-- **Frontend**: JSTL 3.0, EL (Expression Language), CSS3 (Soft UI Design)
+- **Frontend**: JSTL 3.0, EL (Expression Language), CSS3
 
 ---
 
@@ -22,57 +22,55 @@
 MVC 패턴과 1:N 관계형 데이터 구조를 반영한 최종 디렉토리 구조입니다.
 
 ```text
-BackendMaster (Maven Project)
+StepUpBackend (Maven Project)
 ├── src/main/java
-│   ├── com.test.dao           # Data Access Object: 진짜 DB(MySQL)와 대화하는 창구
-│   │   ├── MemberDAO.java     # 회원 가입/조회 쿼리 실행
-│   │   ├── BoardDAO.java      # 게시글 CRUD, 검색, 페이징, 공지사항 투트랙 로직
-│   │   └── CommentDAO.java    # 특정 게시글별 댓글 조회 및 삭제
-│   ├── com.test.dto           # Data Transfer Object: 데이터를 실어나르는 바구니
-│   │   ├── Member.java        # 사용자 정보 객체
-│   │   ├── Board.java         # 게시글 정보 객체
-│   │   └── Comment.java       # 댓글 정보 객체
+│   ├── com.test.dao           # Data Access Object: MySQL 통신 전담
+│   │   ├── MemberDAO.java     # 회원 정보 및 암호화 인증 조회
+│   │   ├── BoardDAO.java      # 게시글 CRUD, 투트랙 쿼리, 검색, 페이징
+│   │   └── CommentDAO.java    # 1:N 관계 기반 댓글 조회 및 삭제
+│   ├── com.test.dto           # Data Transfer Object: 데이터 바구니
+│   │   ├── Member.java / Board.java / Comment.java
 │   ├── com.test.util          # Utility: 공통 도구함
-│   │   ├── DBUtil.java        # MySQL Connection 연결 관리
+│   │   ├── DBUtil.java        # JDBC Connection 관리
 │   │   └── PasswordUtil.java  # SHA-256 단방향 암호화 엔진
-│   ├── com.test.filter        # Filter: 전처리/후처리 감시자
-│   │   ├── EncodingFilter.java    # 전역 UTF-8 인코딩 처리
-│   │   └── LoginCheckFilter.java  # 게시판 접근 보안 인증 제어
-│   ├── com.test.servlet       # Controller: 비즈니스 로직 제어 (Servlet 6.0)
-│   │   ├── BoardListServlet.java  # 검색/페이징/공지사항 투트랙 데이터 로드
-│   │   ├── BoardDetailServlet.java# 본문 + 해당 글의 댓글 동시 로드
-│   │   └── ... (Join, Login, Logout, Update, Delete, CommentWrite/Delete)
-│   └── com.test.db (Deprecated)# Legacy: 초기 빌드업용 가상 DB (흔적 보존용)
+│   ├── com.test.filter        # Filter: 전/후처리 감시자
+│   │   ├── EncodingFilter.java    # UTF-8 전역 인코딩
+│   │   └── LoginCheckFilter.java  # 미인증 사용자 접근 차단 (Security)
+│   ├── com.test.listener      # Listener: 서버 이벤트 감시자
+│   │   └── AppInitListener.java   # 서버 시작 시 관리자 계정 자동 생성 (Init)
+│   ├── com.test.servlet       # Controller: 비즈니스 로직 제어
+│   │   └── ... (BoardList, BoardDetail, Join, Login, Logout 등)
+│   └── com.test.db (Deprecated)# Legacy: 초기 빌드업용 가상 DB (흔적 보존)
+│
+├── src/main/resources
+│   └── sql
+│       └── init.sql           # 🚀 데이터베이스 초기화 스크립트 (DDL/DML)
 │
 └── src/main/webapp            # View & Resources
-    ├── resources/             # 정적 파일 (CSS, Images, JS)
-    ├── board.jsp              # 게시판 목록 (공지 고정 + 가상 번호 적용)
-    ├── boardDetail.jsp        # 게시글 상세보기 (댓글 관리 시스템 통합)
-    ├── boardUpdate.jsp        # 수정 폼
-    ├── join.jsp / login.jsp   # 회원가입 및 로그인 인터페이스
-    ├── index.html             # 메인 대시보드
-    └── WEB-INF/web.xml        # Deployment Descriptor (Filter 설정 등)
+    ├── resources/             # CSS, Images//
+    ├── board.jsp              # 공지 고정 + 가상 번호 로직 적용
+    ├── boardDetail.jsp        # 본문 + 댓글 통합 뷰 (권한 제어)
+    ├── boardWrite.jsp         # 게시물 작성 폼
+    ├── boardUpdate.jsp        # 게시물 수정 폼
+    ├── index.html             # 프로젝트 기술 미션 대시보드
+    └── login.jsp / join.jsp   # 인증 인터페이스
 ```
 
 ---
 
-## 🌟 핵심 구현 성과 (Technical Highlights)
+## 🌟 핵심 기술적 성취 (Technical Highlights)
 
-### 1. 지능형 데이터 로드 (Two-Track Fetching)
-- **공지사항 고정**: 모든 페이지에서 공지사항이 최상단에 고정되도록 공지사항 전용 쿼리와 일반 게시글 페이징 쿼리를 분리하여 처리하는 '투트랙 방식' 구현.
-- **고급 페이징**: SQL `LIMIT` 연산자를 활용하여 필요한 데이터만 부분 로드함으로써 서버 자원 최적화.
-- **가상 번호 공식**: 삭제로 인해 DB PK 이빨이 빠지는 문제를 해결하기 위해, 화면 렌더링 시 실무용 역순 가상 번호 계산 공식 적용.
+**1. 지능형 데이터 로드 (Two-Track Fetching)**
+- **공지사항 상단 고정**: 페이징 처리와 관계없이 공지사항은 모든 페이지에서 최상단에 노출되도록 공지 전용 쿼리와 일반글 페이징 쿼리를 분리하여 병렬 로드하는 로직을 구현했습니다.
+- **SQL 최적화 페이징**: 서버 자원 낭비를 막기 위해 SQL LIMIT 연산자를 활용하여 필요한 범위의 데이터만 DB에서 부분 로드합니다.
 
-### 2. 강력한 보안 및 인증 (Security)
-- **비밀번호 암호화**: `MessageDigest` 클래스를 이용해 평문 비밀번호를 64자리 SHA-256 해시값으로 변환하여 DB 저장.
-- **전역 보안 필터**: `LoginCheckFilter`를 통해 미인증 사용자의 접근을 차단하고, 서버 측에서 작성자 본인 여부를 검증하여 무단 수정/삭제 방지.
+**2. 강력한 보안 아키텍처 (Security)**
+- **비밀번호 단방향 암호화**: MessageDigest를 활용해 사용자 비밀번호를 64자리 SHA-256 해시값으로 변환하여 저장함으로써 DB 노출 시에도 원본 정보를 완벽히 보호합니다.
+- **보안 필터링**: LoginCheckFilter를 통해 미인증 사용자의 접근을 차단하고, 세션 검증을 통해 작성자 본인만 수정/삭제가 가능하도록 권한을 엄격히 제어합니다.
 
-### 3. 관계형 데이터 설계 (RDBMS)
-- **1:N 데이터 매핑**: 게시글(`Board`)과 댓글(`Comment`) 간의 외래키(FK) 설계를 통해 일대다 관계 구축.
-- **연쇄 삭제(CASCADE)**: `ON DELETE CASCADE` 옵션을 적용하여 게시글 삭제 시 관련 댓글이 자동으로 삭제되는 데이터 무결성 보장.
-- **동적 검색**: 검색 조건(제목/내용/작성자)에 따라 SQL 문이 유연하게 변하는 동적 쿼리 로직 구현.
-
----
+**3. 데이터 무결성 및 UX 설계 (RDBMS & UI)**
+- **연쇄 삭제(CASCADE)**: ON DELETE CASCADE 제약 조건을 적용하여 게시글 삭제 시 관련 댓글이 자동으로 삭제되는 데이터 무결성을 보장했습니다.
+- **역순 가상 번호**: DB PK(ID)의 불연속성 문제를 해결하기 위해, 화면 렌더링 시 실무용 가상 번호 계산 공식을 적용하여 사용자에게 빈틈없는 순번을 제공합니다.
 
 ---
 
@@ -87,7 +85,7 @@ BackendMaster (Maven Project)
 
 ---
 
-## 🚦 시작하기 (Installation)
+**## 🚦 시작하기 (Installation)**
 
 1. MySQL에서 `backend_master` 스키마를 생성하고 제공된 DDL 스크립트를 실행합니다.
 2. `DBUtil.java` 파일에서 본인의 MySQL 계정 정보를 수정합니다.
