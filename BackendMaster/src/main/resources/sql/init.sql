@@ -45,3 +45,5 @@ INSERT INTO member_tbl VALUES ('admin', '03ac674216f3e15c761ee1a5e255f067953623c
 INSERT INTO board_tbl (category, title, content, author_id) VALUES 
 ('공지', '📌 Step-up Backend 프로젝트 안내', '시스템 초기화가 완료되었습니다. 미션 가이드에 따라 회원가입부터 시작해 보세요.', 'admin'),
 ('공지', '📢 비밀번호 암호화 확인 방법', '회원가입 후 MySQL에서 member_tbl을 조회하면 암호화된 값을 볼 수 있습니다.', 'admin');
+
+SELECT * FROM member_tbl
