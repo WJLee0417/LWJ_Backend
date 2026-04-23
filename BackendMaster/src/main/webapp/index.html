@@ -3,178 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backend Master - Full-Stack SQL Study Board</title>
+    <title>Step-up Backend: 실전 풀스택 가이드</title>
     <style>
-        /* 1. 기본 테마 및 폰트 설정 */
-        body {
-            font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
-            background-color: #fff5e6; /* 따뜻한 크림색 */
-            margin: 0;
-            padding: 40px 20px;
-            color: #5d4037;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px);
-            padding: 50px;
-            border-radius: 35px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
-        }
-
-        /* 2. 헤더 및 상단 배지 */
+        /* (기존 CSS 스타일 동일하게 유지) */
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; background-color: #fff5e6; margin: 0; padding: 40px 20px; color: #4a3a3a; line-height: 1.7; }
+        .container { max-width: 1100px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); padding: 60px; border-radius: 40px; box-shadow: 0 30px 60px rgba(141, 110, 99, 0.1); }
         header { text-align: center; margin-bottom: 60px; }
-        h1 { font-size: 2.8em; color: #ff7f50; margin-bottom: 10px; letter-spacing: -1px; }
-        .badge-group { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
-        .badge {
-            display: inline-block;
-            padding: 6px 16px;
-            background: #ff7f50;
-            color: white;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(255, 127, 80, 0.2);
-        }
-        .badge.db { background: #8d6e63; } /* DB 강조용 브라운 배지 */
-
-        /* 3. 섹션 스타일 */
-        section { margin-bottom: 50px; }
-        h2 { 
-            font-size: 1.5em;
-            border-left: 6px solid #ff7f50; 
-            padding-left: 15px; 
-            color: #5d4037;
-            margin-bottom: 25px;
-        }
-
-        /* 4. 유저 계정 테이블 */
-        .user-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-        }
-        .user-table th, .user-table td { padding: 15px; border-bottom: 1px solid #f5eee6; text-align: center; }
-        .user-table th { background-color: #ffefdb; color: #8d6e63; font-size: 0.95em; }
-        .user-table tr:last-child td { border-bottom: none; }
-        .pw-tag { font-family: monospace; background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-
-        /* 5. 가이드 카드 그리드 */
-        .step-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-        .step-card {
-            background: white;
-            padding: 25px;
-            border-radius: 25px;
-            border: 1px solid #ffefdb;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .step-card:hover { transform: translateY(-8px); border-color: #ff7f50; box-shadow: 0 10px 25px rgba(255,127,80,0.1); }
-        .step-num { color: #ff7f50; font-weight: 800; font-size: 1.3em; display: block; margin-bottom: 10px; }
-        .step-card p { font-size: 0.95em; color: #666; margin: 0; }
-        .step-card b { color: #444; display: block; margin-bottom: 5px; }
-
-        /* 6. 액션 버튼 */
-        .btn-start {
-            display: block;
-            width: 280px;
-            margin: 50px auto 0;
-            padding: 18px;
-            background: #ff7f50;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 20px;
-            font-size: 1.25em;
-            font-weight: bold;
-            box-shadow: 0 10px 25px rgba(255, 127, 80, 0.3);
-            transition: all 0.3s;
-        }
-        .btn-start:hover { background: #ff6b3d; transform: scale(1.03); }
-
-        code { background: #fff0e6; color: #d35400; padding: 2px 5px; border-radius: 4px; font-size: 0.9em; }
+        .logo-icon { font-size: 3.5em; margin-bottom: 10px; display: block; }
+        h1 { font-size: 2.8em; color: #ff7f50; margin: 0; letter-spacing: -1px; }
+        .version-tag { display: inline-block; background: #8d6e63; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.8em; font-weight: bold; vertical-align: middle; margin-left: 10px; }
+        .sub-text { color: #8d6e63; font-size: 1.1em; margin-top: 15px; }
+        section { margin-bottom: 60px; }
+        h2 { font-size: 1.6em; color: #5d4037; display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
+        h2::before { content: ''; display: inline-block; width: 6px; height: 24px; background: #ff7f50; border-radius: 3px; }
+        .account-box { background: #fffaf5; border: 1px solid #ffefdb; border-radius: 20px; padding: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .acc-item { border-right: 1px solid #ffefdb; padding: 10px; }
+        .acc-item:last-child { border-right: none; }
+        .acc-role { font-weight: 800; color: #ff7f50; font-size: 0.9em; display: block; margin-bottom: 5px;}
+        .acc-info { font-family: 'Courier New', Courier, monospace; font-size: 1.1em; color: #5d4037; }
+        .mission-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; }
+        .mission-card { background: white; padding: 30px; border-radius: 25px; border: 1px solid #eee; transition: 0.3s; position: relative; overflow: hidden; }
+        .mission-card:hover { border-color: #ff7f50; transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+        .mission-tag { position: absolute; top: 0; right: 0; background: #ff7f50; color: white; padding: 5px 15px; font-size: 0.75em; font-weight: bold; border-bottom-left-radius: 15px; }
+        .mission-card h3 { margin-top: 0; color: #5d4037; font-size: 1.3em; }
+        .mission-card ul { padding-left: 20px; margin: 15px 0; color: #666; }
+        .behind-box { background: #f8f9fa; padding: 12px 18px; border-radius: 12px; font-size: 0.9em; color: #8d6e63; border-left: 4px solid #8d6e63; }
+        .btn-wrap { text-align: center; margin-top: 40px; }
+        .btn-start { display: inline-block; padding: 20px 50px; background: #ff7f50; color: white; text-decoration: none; border-radius: 25px; font-size: 1.4em; font-weight: 800; box-shadow: 0 15px 35px rgba(255, 127, 80, 0.3); transition: 0.3s; }
+        .btn-start:hover { background: #ff6b3d; transform: scale(1.05); }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <div class="badge-group">
-                <div class="badge">Architecture Migration Complete</div>
-                <div class="badge db">MySQL 8.0 Inside</div>
-            </div>
-            <h1>🚀 Backend Master</h1>
-            <p style="font-size: 1.1em; color: #8d6e63;">
-                가상 데이터베이스(MockDB)를 넘어 <b>진짜 RDBMS</b>로 진화한 스터디 게시판
+            <span class="logo-icon">🪜</span>
+            <h1>Step-up Backend <span class="version-tag">Migration Edition</span></h1>
+            <p class="sub-text">
+                가짜 데이터(MockDB)에서 <b>진짜 데이터베이스(MySQL)</b>로 계단을 오르듯 진화한 백엔드 아키텍처 프로젝트
             </p>
         </header>
 
         <section>
-            <h2>👥 테스트 계정 시나리오</h2>
-            <p style="margin-bottom: 15px; font-size: 0.95em; color: #777;">
-                비밀번호는 DB 저장 시 <b>SHA-256 단방향 암호화</b>되어 안전하게 관리됩니다.
+            <h2>🔑 실습 준비 및 계정 정보</h2>
+            <p style="margin-top:-15px; margin-bottom:20px; color:#999; font-size:0.9em;">
+                본 프로젝트는 <code>src/main/resources/sql/init.sql</code> 파일을 기반으로 구축되었습니다.
             </p>
-            <table class="user-table">
-                <thead>
-                    <tr>
-                        <th width="20%">권한</th>
-                        <th width="25%">아이디</th>
-                        <th width="25%">비밀번호</th>
-                        <th width="30%">테스트 포인트</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><b>총괄 관리자</b></td><td>admin</td><td><span class="pw-tag">1234</span></td><td>공지 고정 및 전체 글 관리</td></tr>
-                    <tr><td>멤버 1</td><td>user01</td><td><span class="pw-tag">1111</span></td><td>본인 글 수정/삭제 권한</td></tr>
-                    <tr><td>멤버 2</td><td>user02</td><td><span class="pw-tag">2222</span></td><td>댓글 작성 및 삭제 테스트</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section>
-            <h2>🚦 핵심 기술 검증 가이드</h2>
-            <div class="step-grid">
-                <div class="step-card">
-                    <span class="step-num">01</span>
-                    <p><b>Two-Track Fetching</b>
-                    2페이지로 이동해도 📌공지사항은 항상 최상단에 고정되는 쿼리 로직을 확인하세요.</p>
+            <div class="account-box">
+                <div class="acc-item">
+                    <span class="acc-role">SYSTEM ADMIN</span>
+                    <div class="acc-info">ID: admin <br> PW: 1234</div>
                 </div>
-                <div class="step-card">
-                    <span class="step-num">02</span>
-                    <p><b>SHA-256 Security</b>
-                    워크벤치에서 <code>member_tbl</code>의 비밀번호가 해시값으로 변해있는지 확인하세요.</p>
+                <div class="acc-item">
+                    <span class="acc-role">MEMBER 01</span>
+                    <div class="acc-info">ID: user01 <br> PW: 1111</div>
                 </div>
-                <div class="step-card">
-                    <span class="step-num">03</span>
-                    <p><b>Cascade Delete</b>
-                    게시글 삭제 시, 해당 글에 달린 댓글들이 DB에서 함께 자동 폭파되는지 체크하세요.</p>
-                </div>
-                <div class="step-card">
-                    <span class="step-num">04</span>
-                    <p><b>Virtual Numbering</b>
-                    글 삭제로 DB ID에 빈틈이 생겨도, 화면 목록 번호는 빈틈없이 정렬되는 공식을 확인하세요.</p>
+                <div class="acc-item">
+                    <span class="acc-role">MEMBER 02</span>
+                    <div class="acc-info">ID: user02 <br> PW: 2222</div>
                 </div>
             </div>
         </section>
 
-        <div style="text-align: center;">
-            <p style="color: #bbb; font-size: 0.9em;">준비가 되셨다면 아래 버튼을 눌러 테스트를 시작하세요.</p>
+        <section>
+            <h2>🎯 스스로 따라해보는 기술 검증 미션</h2>
+            <div class="mission-grid">
+                
+                <div class="mission-card">
+                    <span class="mission-tag">SECURITY</span>
+                    <h3>Mission 01. 내 비밀번호는 안전할까?</h3>
+                    <ul>
+                        <li><b>회원가입</b> 페이지에서 자신만의 계정을 만들어보세요.</li>
+                        <li>로그인 후 <b>MySQL Workbench</b>를 열어 <code>member_tbl</code>을 조회하세요.</li>
+                    </ul>
+                    <div class="behind-box">
+                        💡 <b>Behind:</b> <code>PasswordUtil</code>이 비밀번호를 64자리 SHA-256 해시값으로 변환했습니다. 개발자도 원문을 알 수 없는 단방향 암호화가 적용되었습니다.
+                    </div>
+                </div>
+
+                <div class="mission-card">
+                    <span class="mission-tag">DATABASE</span>
+                    <h3>Mission 02. 연쇄 삭제의 마법 (Cascade)</h3>
+                    <ul>
+                        <li>게시글에 <b>댓글을 3개</b> 달고, 그 게시글을 과감하게 <b>삭제</b>해보세요.</li>
+                        <li>DB의 <code>comment_tbl</code>에서 해당 댓글들이 어떻게 되었는지 확인하세요.</li>
+                    </ul>
+                    <div class="behind-box">
+                        💡 <b>Behind:</b> <code>ON DELETE CASCADE</code> 제약조건 덕분에 부모 데이터 삭제 시 자식 데이터도 자동 삭제되어 데이터 무결성이 유지됩니다.
+                    </div>
+                </div>
+
+                <div class="mission-card">
+                    <span class="mission-tag">LOGIC</span>
+                    <h3>Mission 03. 공지는 왜 항상 위에 있을까?</h3>
+                    <ul>
+                        <li>관리자 계정으로 <b>공지사항</b>을 쓰고, 일반 글을 여러 개 써서 <b>2페이지</b>로 가보세요.</li>
+                        <li>2페이지에서도 공지사항이 상단에 고정되어 있는지 확인하세요.</li>
+                    </ul>
+                    <div class="behind-box">
+                        💡 <b>Behind:</b> <code>BoardDAO</code>의 <b>투트랙(Two-Track) 쿼리</b> 로직이 페이징과 무관하게 공지사항을 최상단에 항상 렌더링합니다.
+                    </div>
+                </div>
+
+                <div class="mission-card">
+                    <span class="mission-tag">UI/UX</span>
+                    <h3>Mission 04. 이빨 빠진 번호 예쁘게 채우기</h3>
+                    <ul>
+                        <li>목록 중간의 글을 삭제한 뒤, 번호가 <b>1, 2, 3, 4</b> 순으로 예쁘게 정렬되는지 보세요.</li>
+                        <li>DB의 실제 ID(PK) 값은 어떻게 변했는지 비교해보세요.</li>
+                    </ul>
+                    <div class="behind-box">
+                        💡 <b>Behind:</b> DB의 PK는 고유 식별을 위해 유지하고, 화면에는 <b>가상 번호 공식</b>을 적용하여 사용자 친화적인 순번을 제공합니다.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="btn-wrap">
             <a href="login.jsp" class="btn-start">시스템 접속하기 👉</a>
         </div>
     </div>
 
-    <footer style="text-align: center; margin-top: 30px; color: #8d6e63; font-size: 0.85em;">
-        &copy; 2024 Backend Master Study Project. All rights reserved.
+    <footer style="text-align: center; margin-top: 40px; color: #8d6e63; font-size: 0.9em; padding-bottom: 40px;">
+        &copy; 2024 Step-up Backend Project. Designed for Full-Stack Learning.
     </footer>
 
 </body>
