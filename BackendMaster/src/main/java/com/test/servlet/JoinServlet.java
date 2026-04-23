@@ -17,34 +17,33 @@ public class JoinServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 1. 인코딩 처리 (한글 깨짐 방지)
+        request.setCharacterEncoding("UTF-8");
+
+        // 2. 화면에서 넘어온 파라미터 받기
         String id = request.getParameter("id");
-        String rawPw = request.getParameter("pw"); 
+        String pw = request.getParameter("pw");
         String name = request.getParameter("name");
-        String part = request.getParameter("part");
+        // 🚀 추가된 부분: part 파라미터 받기
+        String part = request.getParameter("part"); 
 
-        // 🚀 1. DB 작업을 전담할 DAO 객체 생성
-        MemberDAO dao = new MemberDAO();
+        // 3. 비밀번호 단방향 암호화 (SHA-256)
+        String hashedPw = PasswordUtil.hashPassword(pw);
 
-        // 2. 아이디 중복 체크 (MockDB 대신 DAO 사용)
-        if (dao.getMemberById(id) != null) {
-            request.setAttribute("errorMsg", "이미 사용 중인 아이디입니다. 다른 아이디를 입력해 주세요.");
-            request.getRequestDispatcher("join.jsp").forward(request, response);
-            return; 
-        }
-
-        // 3. 비밀번호 암호화
-        String hashedPw = PasswordUtil.hashPassword(rawPw);
+        // 4. Member 객체 생성 및 DB 저장
+        // 🚀 수정된 부분: 생성자에 part 데이터도 함께 넣어줍니다.
         Member newMember = new Member(id, hashedPw, name, part);
-
-        // 🚀 4. DAO를 통해 진짜 MySQL DB에 저장!
+        
+        MemberDAO dao = new MemberDAO();
         boolean isSuccess = dao.insertMember(newMember);
 
         // 5. 결과에 따른 페이지 이동
         if (isSuccess) {
+            System.out.println(name + "님 회원가입 성공! (역할: " + part + ")");
             response.sendRedirect("login.jsp"); // 성공 시 로그인 화면으로
         } else {
-            request.setAttribute("errorMsg", "DB 저장 중 오류가 발생했습니다.");
-            request.getRequestDispatcher("join.jsp").forward(request, response);
+            System.out.println("회원가입 실패: 아이디 중복 등");
+            response.sendRedirect("join.jsp"); // 실패 시 다시 가입 화면으로
         }
     }
 }
