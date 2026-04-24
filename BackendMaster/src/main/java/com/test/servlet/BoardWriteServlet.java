@@ -21,12 +21,14 @@ public class BoardWriteServlet extends HttpServlet {
     	String title = request.getParameter("title");
     	String authorId = request.getParameter("authorId");
     	String content = request.getParameter("content");
+    	int views = Integer.parseInt(request.getParameter("views"));
+    	String createdAt = request.getParameter("createdAt");
 
     	// 새로운 Board 객체 생성 시 category 포함
     	//Board newBoard = new Board(MockDB.boardSeq, category, title, content, authorId);
     	//MockDB.boardTable.put(MockDB.boardSeq++, newBoard);
     	BoardDAO dao = new BoardDAO();
-    	dao.insertBoard(new Board(0, category, title, content, authorId));
+    	dao.insertBoard(new Board(0, category, title, content, authorId, views, createdAt));
     	
     	response.sendRedirect("BoardListServlet");
     }

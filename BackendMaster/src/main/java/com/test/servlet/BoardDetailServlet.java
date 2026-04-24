@@ -1,12 +1,10 @@
 package com.test.servlet;
 
 import java.io.IOException;
-import java.util.List;
 
 import com.test.dao.BoardDAO;
-import com.test.dao.CommentDAO;
 import com.test.dto.Board;
-import com.test.dto.Comment;
+import com.test.dto.Member;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,25 +14,25 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/BoardDetailServlet")
 public class BoardDetailServlet extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. 파라미터로 넘어온 글 번호 받기
-        int id = Integer.parseInt(request.getParameter("id"));
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    // 1. 클릭한 게시글 번호 받기
+	    int id = Integer.parseInt(request.getParameter("id"));
+	    BoardDAO boardDao = new BoardDAO();
+	    
+	    // 2. DB에서 게시글 원본 데이터 먼저 가져오기 (작성자가 누군지 확인하기 위해)
+	    Board board = boardDao.getBoardById(id);
 
-        // 2. MockDB에서 해당 번호의 게시글 객체 꺼내기 (Model 활용)
-        //Board board = MockDB.boardTable.get(id);
-        BoardDAO dao = new BoardDAO();
-        Board board = dao.getBoardById(id);
-        
-     // 🚀 [수정됨] 해당 게시글에 달린 댓글 목록 가져오기 (MockDB 삭제)
-        CommentDAO commentDao = new CommentDAO();
-        List<Comment> commentList = commentDao.getCommentList(id);
+	    // 3. 세션에서 현재 로그인한 유저 정보 꺼내기
+	    Member loginUser = (Member) request.getSession().getAttribute("loginUser");
 
-        if (board != null) {
-            request.setAttribute("board", board);
-            request.setAttribute("commentList", commentList); // 화면으로 댓글 리스트 전달
-            request.getRequestDispatcher("boardDetail.jsp").forward(request, response);
-        } else {
-            response.sendRedirect("BoardListServlet");
-        }
-    }
+	    // 4. 🚀 [핵심 실무 로직] 로그인 유저가 존재하고, 그 유저 ID가 글 작성자 ID와 '다를 때만' 조회수 증가!
+	    if (loginUser != null && !loginUser.getId().equals(board.getAuthorId())) {
+	        boardDao.incrementViewCount(id);      // DB 조회수 1 증가
+	        board.setViews(board.getViews() + 1); // 현재 화면에 뿌려줄 메모리 객체의 조회수도 1 증가 (싱크 맞추기)
+	    }
+
+	    // 5. 화면(JSP)으로 데이터 전달
+	    request.setAttribute("board", board);
+	    request.getRequestDispatcher("boardDetail.jsp").forward(request, response);
+	}
 }

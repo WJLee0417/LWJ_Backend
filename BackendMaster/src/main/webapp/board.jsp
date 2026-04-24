@@ -1,6 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+
+<%-- 🚀 브라우저 캐시 무효화 (뒤로 가기 시 무조건 서버 갱신) --%>
+<%
+    response.setHeader("Cache-Control","no-store"); // HTTP 1.1
+    response.setHeader("Pragma","no-cache");        // HTTP 1.0
+    response.setDateHeader("Expires",0);            // Proxy Server
+%>
 
 <!DOCTYPE html>
 <html>
@@ -243,10 +249,13 @@ tr:hover {
 			<table>
 				<thead>
 					<tr>
+                        <%-- 열 너비 비율을 100%에 맞게 재조정 --%>
 						<th width="8%">번호</th>
-						<th width="12%">분류</th>
-						<th width="45%">제목</th>
-						<th width="15%">작성자</th>
+						<th width="10%">분류</th>
+						<th width="38%">제목</th>
+						<th width="12%">작성자</th>
+						<th width="8%">조회수</th>    <%-- 🚀 추가 --%>
+						<th width="14%">등록일</th>    <%-- 🚀 추가 --%>
 						<th width="10%">관리</th>
 					</tr>
 				</thead>
@@ -256,7 +265,7 @@ tr:hover {
 						<c:when
 							test="${empty requestScope.noticeList && empty requestScope.boardList}">
 							<tr>
-								<td colspan="5"
+								<td colspan="7"
 									style="text-align: center; padding: 100px 0; color: #999;">
 									선택하신 카테고리에 등록된 글이 없습니다.<br>첫 번째 이야기의 주인공이 되어보세요!
 								</td>
@@ -277,8 +286,14 @@ tr:hover {
 										href="BoardDetailServlet?id=${notice.id}" class="title-link">
 											<c:out value="${notice.title}" />
 									</a></td>
-									<td style="text-align: center; font-weight: 500;"><c:out
-											value="${notice.authorId}" /></td>
+									<td style="text-align: center; font-weight: 500;">
+                                        <c:out value="${notice.authorId}" />
+                                    </td>
+                                    
+                                    <%-- 🚀 공지사항 조회수 및 등록일 출력 --%>
+                                    <td style="text-align: center; color: #777;">${notice.views}</td>
+                                    <td style="text-align: center; color: #777; font-size: 0.9em;">${notice.createdAt}</td>
+
 									<td style="text-align: center;"><c:choose>
 											<c:when
 												test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == notice.authorId}">
@@ -308,8 +323,14 @@ tr:hover {
 										href="BoardDetailServlet?id=${board.id}" class="title-link">
 											<c:out value="${board.title}" />
 									</a></td>
-									<td style="text-align: center; font-weight: 500;"><c:out
-											value="${board.authorId}" /></td>
+									<td style="text-align: center; font-weight: 500;">
+                                        <c:out value="${board.authorId}" />
+                                    </td>
+                                    
+                                    <%-- 🚀 일반 게시글 조회수 및 등록일 출력 --%>
+                                    <td style="text-align: center; color: #777;">${board.views}</td>
+                                    <td style="text-align: center; color: #777; font-size: 0.9em;">${board.createdAt}</td>
+
 									<td style="text-align: center;"><c:choose>
 											<c:when
 												test="${sessionScope.loginUser.id == 'admin' || sessionScope.loginUser.id == board.authorId}">

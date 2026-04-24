@@ -37,13 +37,15 @@ public class BoardUpdateServlet extends HttpServlet {
         String category = request.getParameter("category");
         String title = request.getParameter("title");
         String content = request.getParameter("content");
+        int views = Integer.parseInt(request.getParameter("views"));
+        String createdAt = request.getParameter("createdAt");
 
         // 🚀 [수정] DAO 객체 생성
         BoardDAO dao = new BoardDAO();
         
         // 수정할 내용(ID, 카테고리, 제목, 내용)만 담은 DTO 객체 생성
         // (작성자는 수정하지 않으므로 임시로 null 처리합니다)
-        Board updateBoard = new Board(id, category, title, content, null);
+        Board updateBoard = new Board(id, category, title, content, null, views, createdAt);
 
         // DAO의 updateBoard 메서드를 호출하여 실제 MySQL DB 덮어쓰기
         boolean isSuccess = dao.updateBoard(updateBoard);
