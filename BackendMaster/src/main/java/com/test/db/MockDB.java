@@ -18,7 +18,7 @@ public class MockDB {
 
     static {
         // 1. 회원 더미 데이터 세팅 (유저 5명 + 관리자 1명)
-    	memberTable.put("admin", new Member("admin", PasswordUtil.hashPassword("1234"), "관리자", "공지사항 및 전체 관리"));
+        memberTable.put("admin", new Member("admin", PasswordUtil.hashPassword("mock-admin-password"), "관리자", "공지사항 및 전체 관리"));
         memberTable.put("user01", new Member("user01", PasswordUtil.hashPassword("1111"), "백엔드초보", "1. Servlet (서블릿) 기초"));
         memberTable.put("user02", new Member("user02", PasswordUtil.hashPassword("2222"), "JSP마스터", "2. JSP 동작 원리"));
         memberTable.put("user03", new Member("user03", PasswordUtil.hashPassword("3333"), "쿠키도둑", "3. Session & Cookie"));

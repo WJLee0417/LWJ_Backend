@@ -136,7 +136,7 @@
                 ├── src/main/java<br>
                 │   ├── com.test.dao &nbsp;&nbsp;&nbsp;&nbsp;<b># MySQL Query Logic (Board, Member, Comment)</b><br>
                 │   ├── com.test.dto &nbsp;&nbsp;&nbsp;&nbsp;<b># Data Transfer Objects</b><br>
-                │   ├── com.test.util &nbsp;&nbsp;&nbsp;<b># DBUtil, PasswordUtil (SHA-256)</b><br>
+                │   ├── com.test.util &nbsp;&nbsp;&nbsp;<b># DBUtil, PasswordUtil (BCrypt)</b><br>
                 │   ├── com.test.filter &nbsp;&nbsp;<b># Security & Encoding Filters</b><br>
                 │   ├── com.test.listener <b># AppInitListener (Auto Admin Create)</b><br>
                 │   ├── com.test.servlet &nbsp;<b># Controllers (Servlet 6.0)</b><br>
@@ -157,9 +157,9 @@
             <h2>🔑 실습용 테스트 계정</h2>
             <div class="account-box">
                 <div class="acc-item">
-                    <span class="acc-status status-ready">기본 제공</span>
+                    <span class="acc-status status-need">환경변수 설정</span>
                     <span class="acc-role">ADMIN (총괄 관리자)</span>
-                    ID: <b>admin</b> <br> PW: <b>1234</b>
+                    <code>ADMIN_INITIAL_PASSWORD</code> 설정 시 생성됩니다.
                 </div>
                 <div class="acc-item">
                     <span class="acc-status status-need">직접 가입</span>
