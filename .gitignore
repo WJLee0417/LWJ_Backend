@@ -4,3 +4,16 @@
 .env
 .env.*
 !.env.example
+
+# Maven build output
+BackendMaster/target/
+
+# Eclipse / WTP metadata
+BackendMaster/.classpath
+BackendMaster/.project
+BackendMaster/.settings/
+Servers/
+
+# Operating system files
+.DS_Store
+Thumbs.db
