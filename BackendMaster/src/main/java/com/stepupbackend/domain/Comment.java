@@ -70,4 +70,8 @@ public class Comment {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    public boolean isWrittenBy(String memberId) {
+        return author != null && author.getId().equals(memberId);
+    }
 }

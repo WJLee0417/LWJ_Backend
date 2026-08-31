@@ -69,6 +69,16 @@ public class Board {
         views++;
     }
 
+    public void update(String category, String title, String content) {
+        this.category = category;
+        this.title = title;
+        this.content = content;
+    }
+
+    public boolean isWrittenBy(String memberId) {
+        return author != null && author.getId().equals(memberId);
+    }
+
     public Long getId() {
         return id;
     }
