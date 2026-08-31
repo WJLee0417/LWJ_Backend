@@ -1,6 +1,6 @@
 /*
-  Step-up Backend: Mock-to-SQL Project 
-  초기 데이터베이스 구축 스크립트 (v2.1)
+  Step-up Backend: Mock-to-SQL Project
+  초기 데이터베이스 구축 스크립트
 */
 
 -- 1. 기존 테이블 삭제
@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS comment_tbl;
 DROP TABLE IF EXISTS board_tbl;
 DROP TABLE IF EXISTS member_tbl;
 
--- 2. 회원 테이블 (SHA-256 암호화 적용)
+-- 2. 회원 테이블 (BCrypt password hash 저장)
 CREATE TABLE member_tbl (
     id VARCHAR(50) PRIMARY KEY,
     pw VARCHAR(255) NOT NULL,
@@ -38,12 +38,9 @@ CREATE TABLE comment_tbl (
     FOREIGN KEY (author_id) REFERENCES member_tbl(id) ON DELETE SET NULL
 );
 
--- 5. 필수 초기 데이터 (총괄 관리자: admin / 비번: 1234)
-INSERT INTO member_tbl VALUES ('admin', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '마스터관리자', '시스템 총괄');
+-- 5. 관리자 계정은 애플리케이션 시작 시 AppInitListener가 BCrypt 해시로 생성한다.
 
--- 6. 테스트용 공지사항 (작성자: admin)
+-- 6. 테스트용 공지사항은 관리자 계정 생성 후 별도로 추가한다.
 INSERT INTO board_tbl (category, title, content, author_id) VALUES 
-('공지', '📌 Step-up Backend 프로젝트 안내', '시스템 초기화가 완료되었습니다. 미션 가이드에 따라 회원가입부터 시작해 보세요.', 'admin'),
-('공지', '📢 비밀번호 암호화 확인 방법', '회원가입 후 MySQL에서 member_tbl을 조회하면 암호화된 값을 볼 수 있습니다.', 'admin');
-
-SELECT * FROM member_tbl
+('공지', '📌 Step-up Backend 프로젝트 안내', '시스템 초기화가 완료되었습니다. 미션 가이드에 따라 회원가입부터 시작해 보세요.', NULL),
+('공지', '📢 비밀번호 해싱 확인 방법', '회원가입 후 MySQL에서 member_tbl을 조회하면 BCrypt 해시값을 볼 수 있습니다.', NULL);

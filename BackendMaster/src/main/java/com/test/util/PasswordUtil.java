@@ -1,24 +1,29 @@
 package com.test.util;
 
-import java.security.MessageDigest;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class PasswordUtil {
-    
-    // 평문 비밀번호를 SHA-256 해시값으로 변환하는 메서드
+
+    private static final int BCRYPT_LOG_ROUNDS = 12;
+
+    private PasswordUtil() {
+    }
+
     public static String hashPassword(String plainText) {
+        if (plainText == null || plainText.isBlank()) {
+            throw new IllegalArgumentException("Password must not be blank.");
+        }
+        return BCrypt.hashpw(plainText, BCrypt.gensalt(BCRYPT_LOG_ROUNDS));
+    }
+
+    public static boolean matches(String plainText, String hashedPassword) {
+        if (plainText == null || hashedPassword == null || hashedPassword.isBlank()) {
+            return false;
+        }
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(plainText.getBytes("UTF-8"));
-            byte[] byteData = md.digest();
-            
-            // 바이트를 16진수 문자열로 변환
-            StringBuilder sb = new StringBuilder();
-            for (byte b : byteData) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("비밀번호 해싱 중 오류 발생", e);
+            return BCrypt.checkpw(plainText, hashedPassword);
+        } catch (IllegalArgumentException e) {
+            return false;
         }
     }
 }

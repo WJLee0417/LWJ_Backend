@@ -28,11 +28,8 @@ public class LoginServlet extends HttpServlet {
         MemberDAO dao = new MemberDAO();
         Member member = dao.getMemberById(id);
 
-        // 2. 사용자가 입력한 비밀번호 암호화
-        String hashedInputPw = PasswordUtil.hashPassword(rawPw);
-
-        // 3. 로그인 검증
-        if (member != null && member.getPw().equals(hashedInputPw)) {
+        // 2. BCrypt 해시와 입력 비밀번호를 비교
+        if (member != null && PasswordUtil.matches(rawPw, member.getPw())) {
             // [로그인 성공]
             HttpSession session = request.getSession();
             session.setAttribute("loginUser", member); 

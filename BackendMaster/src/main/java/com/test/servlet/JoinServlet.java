@@ -27,7 +27,7 @@ public class JoinServlet extends HttpServlet {
         // 🚀 추가된 부분: part 파라미터 받기
         String part = request.getParameter("part"); 
 
-        // 3. 비밀번호 단방향 암호화 (SHA-256)
+        // 3. 비밀번호 단방향 해싱 (BCrypt)
         String hashedPw = PasswordUtil.hashPassword(pw);
 
         // 4. Member 객체 생성 및 DB 저장
