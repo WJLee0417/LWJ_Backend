@@ -5,15 +5,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.test.dto.Board;
 import com.test.util.DBUtil;
 
 public class BoardDAO {
+    private static final Logger LOGGER = Logger.getLogger(BoardDAO.class.getName());
+    private static final String NOTICE_CATEGORY = "공지";
 
-	// 1. 게시글 작성 (Create)
+	/** Inserts a board. Database defaults initialize the creation time and view count. */
 	public boolean insertBoard(Board board) {
-		// id는 AUTO_INCREMENT이므로 제외, created_at은 DEFAULT CURRENT_TIMESTAMP로 자동 입력됨
 		String sql = "INSERT INTO board_tbl (category, title, content, author_id) VALUES (?, ?, ?, ?)";
 
 		try (Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -25,15 +28,14 @@ public class BoardDAO {
 
 			return pstmt.executeUpdate() > 0;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logDatabaseFailure("insert board");
 		}
 		return false;
 	}
 
-	// 2. 게시글 상세 조회 (Read)
+	/** Loads one board and includes a detail-friendly timestamp. */
 	public Board getBoardById(int id) {
 	    Board board = null;
-	    // 💡 상세보기는 시간(시:분)까지 보여주기 위해 포맷을 조금 다르게 합니다.
 	    String sql = "SELECT *, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') AS f_date FROM board_tbl WHERE id = ?";
 	    
 	    try (Connection conn = DBUtil.getConnection();
@@ -49,18 +51,18 @@ public class BoardDAO {
 	                    rs.getString("title"), 
 	                    rs.getString("content"),
 	                    rs.getString("author_id"),
-	                    rs.getInt("views"),          // 🚀 추가: 조회수
-	                    rs.getString("f_date")       // 🚀 추가: 포맷팅된 날짜+시간
+	                    rs.getInt("views"),
+	                    rs.getString("f_date")
 	                );
 	            }
 	        }
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        logDatabaseFailure("load board detail");
 	    }
 	    return board;
 	}
 
-	// 3. 게시글 수정 (Update)
+	/** Updates the editable fields of one board. */
 	public boolean updateBoard(Board board) {
 		String sql = "UPDATE board_tbl SET category = ?, title = ?, content = ? WHERE id = ?";
 		try (Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -68,16 +70,16 @@ public class BoardDAO {
 			pstmt.setString(1, board.getCategory());
 			pstmt.setString(2, board.getTitle());
 			pstmt.setString(3, board.getContent());
-			pstmt.setInt(4, board.getId()); // 수정할 대상의 ID
+			pstmt.setInt(4, board.getId());
 
 			return pstmt.executeUpdate() > 0;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logDatabaseFailure("update board");
 		}
 		return false;
 	}
 
-	// 4. 게시글 삭제 (Delete)
+	/** Deletes one board. Related comments are removed by the database foreign key. */
 	public boolean deleteBoard(int id) {
 		String sql = "DELETE FROM board_tbl WHERE id = ?";
 		try (Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -85,18 +87,18 @@ public class BoardDAO {
 			pstmt.setInt(1, id);
 			return pstmt.executeUpdate() > 0;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logDatabaseFailure("delete board");
 		}
 		return false;
 	}
 
-	// ============================================================================
-	// 🚀 [추가] 5-1. 공지사항만 무조건 전부 가져오기 (페이징 무시)
-	// ============================================================================
+	/**
+	 * Returns all notices independently of pagination so they stay pinned above each
+	 * normal-board page.
+	 */
 	public List<Board> getNoticeList() {
 	    List<Board> list = new ArrayList<>();
-	    // 💡 SELECT * 뒤에 DATE_FORMAT을 추가하여 f_date라는 이름으로 예쁘게 포맷팅된 날짜를 가져옵니다.
-	    String sql = "SELECT *, DATE_FORMAT(created_at, '%Y-%m-%d') AS f_date FROM board_tbl WHERE category = '공지' ORDER BY id DESC";
+	    String sql = "SELECT *, DATE_FORMAT(created_at, '%Y-%m-%d') AS f_date FROM board_tbl WHERE category = '" + NOTICE_CATEGORY + "' ORDER BY id DESC";
 	    
 	    try (Connection conn = DBUtil.getConnection();
 	         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -108,24 +110,23 @@ public class BoardDAO {
 	                rs.getString("title"), 
 	                rs.getString("content"),
 	                rs.getString("author_id"),
-	                rs.getInt("views"),          // 🚀 추가: 조회수
-	                rs.getString("f_date")       // 🚀 추가: 예쁘게 자른 날짜
+	                rs.getInt("views"),
+	                rs.getString("f_date")
 	            ));
 	        }
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        logDatabaseFailure("load notices");
 	    }
 	    return list;
 	}
 
-	// ============================================================================
-	// 🚀 [수정] 5-2. 일반 게시글 목록 조회 (공지사항 제외 + 페이징 적용)
-	// ============================================================================
+	/**
+	 * Returns one page of non-notice boards. The same filters are used by
+	 * {@link #getTotalBoardCount(String, String, String)} to keep page counts aligned.
+	 */
 	public List<Board> getBoardList(String category, String searchType, String keyword, int startIndex, int postsPerPage) {
 	    List<Board> list = new ArrayList<>();
-	    
-	    // 💡 여기도 DATE_FORMAT 추가!
-	    StringBuilder sql = new StringBuilder("SELECT *, DATE_FORMAT(created_at, '%Y-%m-%d') AS f_date FROM board_tbl WHERE category != '공지' ");
+	    StringBuilder sql = new StringBuilder("SELECT *, DATE_FORMAT(created_at, '%Y-%m-%d') AS f_date FROM board_tbl WHERE category != '" + NOTICE_CATEGORY + "' ");
 	    List<Object> params = new ArrayList<>();
 
 	    if (category != null && !category.equals("전체")) {
@@ -155,24 +156,21 @@ public class BoardDAO {
 	                    rs.getString("title"), 
 	                    rs.getString("content"), 
 	                    rs.getString("author_id"),
-	                    rs.getInt("views"),      // 🚀 추가: 조회수
-	                    rs.getString("f_date")   // 🚀 추가: 예쁘게 자른 날짜
+	                    rs.getInt("views"),
+	                    rs.getString("f_date")
 	                ));
 	            }
 	        }
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        logDatabaseFailure("load board list");
 	    }
 	    return list;
 	}
 
-	// ============================================================================
-	// 🚀 [수정] 6. 총 게시글 수 (공지사항 제외하고 카운트)
-	// ============================================================================
+	/** Counts non-notice boards using the list query's category and search filters. */
 	public int getTotalBoardCount(String category, String searchType, String keyword) {
 		int totalCount = 0;
-		// 💡 중요: 페이징 계산이 꼬이지 않도록 공지사항은 개수에서 제외합니다.
-		StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM board_tbl WHERE category != '공지' ");
+		StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM board_tbl WHERE category != '" + NOTICE_CATEGORY + "' ");
 		List<Object> params = new ArrayList<>();
 
 		if (category != null && !category.equals("전체")) {
@@ -199,22 +197,23 @@ public class BoardDAO {
 					totalCount = rs.getInt(1);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logDatabaseFailure("count boards");
 		}
 		return totalCount;
 	}
 
-	// 🚀 1. 모든 조회 쿼리(getBoardList, getNoticeList 등)에 views와 created_at 추가
-	// 예: SELECT *, DATE_FORMAT(created_at, '%Y-%m-%d') as f_date FROM board_tbl ...
-
-	// 🚀 2. 조회수 증가 메서드 추가
+	/** Atomically increments a board view count in the database. */
 	public void incrementViewCount(int id) {
 		String sql = "UPDATE board_tbl SET views = views + 1 WHERE id = ?";
 		try (Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setInt(1, id);
 			pstmt.executeUpdate();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logDatabaseFailure("increment board views");
 		}
+	}
+
+	private static void logDatabaseFailure(String operation) {
+		LOGGER.log(Level.WARNING, "Database operation failed: {0}", operation);
 	}
 }

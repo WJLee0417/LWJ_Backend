@@ -8,7 +8,12 @@ import com.test.dto.Comment;
 import com.test.dto.Member;
 import com.test.util.PasswordUtil;
 
-@Deprecated
+/**
+ * Legacy in-memory fixture retained only as a record of the pre-JDBC learning
+ * stage. Production request paths use DAO classes and {@code DBUtil}; this class
+ * is not part of the runtime data flow.
+ */
+@Deprecated(since = "JDBC migration", forRemoval = false)
 public class MockDB {
     public static Map<String, Member> memberTable = new HashMap<>();
     public static Map<Integer, Board> boardTable = new HashMap<>();

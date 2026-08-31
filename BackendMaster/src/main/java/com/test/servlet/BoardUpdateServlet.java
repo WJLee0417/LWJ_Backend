@@ -2,7 +2,7 @@ package com.test.servlet;
 
 import java.io.IOException;
 
-import com.test.dao.BoardDAO; // 🚀 DAO 임포트 필수!
+import com.test.dao.BoardDAO;
 import com.test.dto.Board;
 
 import jakarta.servlet.ServletException;
@@ -19,7 +19,6 @@ public class BoardUpdateServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         
-        // 🚀 [수정] MockDB 대신 DAO를 통해 DB에서 글 번호로 데이터 가져오기
         BoardDAO dao = new BoardDAO();
         Board board = dao.getBoardById(id);
 
@@ -40,7 +39,6 @@ public class BoardUpdateServlet extends HttpServlet {
         int views = Integer.parseInt(request.getParameter("views"));
         String createdAt = request.getParameter("createdAt");
 
-        // 🚀 [수정] DAO 객체 생성
         BoardDAO dao = new BoardDAO();
         
         // 수정할 내용(ID, 카테고리, 제목, 내용)만 담은 DTO 객체 생성

@@ -5,15 +5,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.test.dto.Comment;
 import com.test.util.DBUtil;
 
 public class CommentDAO {
+    private static final Logger LOGGER = Logger.getLogger(CommentDAO.class.getName());
 
-    // 1. 댓글 작성 (Create)
+    /** Inserts a comment linked to one board. */
     public boolean insertComment(Comment comment) {
-        // id는 AUTO_INCREMENT, created_at은 DEFAULT CURRENT_TIMESTAMP로 자동 입력
         String sql = "INSERT INTO comment_tbl (board_id, author_id, content) VALUES (?, ?, ?)";
         
         try (Connection conn = DBUtil.getConnection();
@@ -25,15 +27,14 @@ public class CommentDAO {
             
             return pstmt.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logDatabaseFailure("insert comment");
         }
         return false;
     }
 
-    // 2. 특정 게시글의 댓글 목록 조회 (Read - 1:N 관계 핵심!)
+    /** Returns comments for one board in creation order. */
     public List<Comment> getCommentList(int boardId) {
         List<Comment> list = new ArrayList<>();
-        // 해당 게시글(board_id)에 달린 댓글만, 작성된 순서(id ASC)대로 가져옴
         String sql = "SELECT * FROM comment_tbl WHERE board_id = ? ORDER BY id ASC";
         
         try (Connection conn = DBUtil.getConnection();
@@ -52,12 +53,12 @@ public class CommentDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logDatabaseFailure("load comments");
         }
         return list;
     }
 
-    // 3. 개별 댓글 삭제 (Delete)
+    /** Deletes one comment. Authorization is checked by the servlet before this call. */
     public boolean deleteComment(int id) {
         String sql = "DELETE FROM comment_tbl WHERE id = ?";
         
@@ -67,8 +68,12 @@ public class CommentDAO {
             pstmt.setInt(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logDatabaseFailure("delete comment");
         }
         return false;
+    }
+
+    private static void logDatabaseFailure(String operation) {
+        LOGGER.log(Level.WARNING, "Database operation failed: {0}", operation);
     }
 }

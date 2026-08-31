@@ -40,11 +40,11 @@ StepUpBackend (Maven Project)
 │   │   └── AppInitListener.java   # 서버 시작 시 관리자 계정 자동 생성 (Init)
 │   ├── com.test.servlet       # Controller: 비즈니스 로직 제어
 │   │   └── ... (BoardList, BoardDetail, Join, Login, Logout 등)
-│   └── com.test.db (Deprecated)# Legacy: 초기 빌드업용 가상 DB (흔적 보존)
+│   └── com.test.db (Deprecated) # JDBC 전환 전 학습 기록. 실제 실행 경로에서는 사용하지 않음.
 │
 ├── src/main/resources
 │   └── sql
-│       └── init.sql           # 🚀 데이터베이스 초기화 스크립트 (DDL/DML)
+│       └── init.sql           # 데이터베이스 초기화 스크립트 (DDL/DML)
 │
 └── src/main/webapp            # View & Resources
     ├── resources/             # CSS, Images//
@@ -62,7 +62,8 @@ StepUpBackend (Maven Project)
 
 **1. 지능형 데이터 로드 (Two-Track Fetching)**
 - **공지사항 상단 고정**: 페이징 처리와 관계없이 공지사항은 모든 페이지에서 최상단에 노출되도록 공지 전용 쿼리와 일반글 페이징 쿼리를 분리하여 병렬 로드하는 로직을 구현했습니다.
-- **SQL 최적화 페이징**: 서버 자원 낭비를 막기 위해 SQL LIMIT 연산자를 활용하여 필요한 범위의 데이터만 DB에서 부분 로드합니다.
+- **검색·페이징 정합성**: 일반글 목록과 총 게시글 수에 같은 카테고리·검색 조건을 적용하고, `LIMIT`으로 필요한 범위만 조회합니다. 공지사항은 일반글 수와 페이지 계산에서 제외합니다.
+- **조회수 처리**: 상세 조회 시 작성자 본인이 아닌 로그인 사용자의 요청에 한해 `views = views + 1`을 DB에서 원자적으로 수행하고, 현재 응답의 표시값도 함께 갱신합니다.
 
 **2. 인증과 접근 제어 (Security)**
 - **BCrypt 비밀번호 해싱**: 회원가입 시 매번 새로운 salt를 사용한 BCrypt 해시를 저장하고, 로그인 시 평문을 다시 해시하지 않고 저장된 해시와 비교합니다.
@@ -81,7 +82,7 @@ StepUpBackend (Maven Project)
 1.  **Phase 1 (MockDB)**: Java Collections(`HashMap`)를 활용한 메모리 기반 데이터 처리 로직 검증.
 2.  **Phase 2 (DAO Pattern)**: 비즈니스 로직과 데이터 접근 로직을 분리하는 DAO 패턴 도입.
 3.  **Phase 3 (SQL Integration)**: JDBC를 통한 MySQL 연동 및 데이터 마이그레이션 완료.
-    - *현재 `com.test.db.MockDB` 클래스는 빌드업 과정의 기록을 위해 `@Deprecated` 처리되어 보존 중입니다.*
+    - `com.test.db.MockDB`는 JDBC 전환 전의 학습 기록으로만 `@Deprecated` 상태로 보존합니다. Servlet의 실제 요청 흐름은 `Servlet → DAO → DBUtil → MySQL`이며 `MockDB`를 사용하지 않습니다.
 
 ---
 

@@ -27,7 +27,6 @@ public class CommentWriteServlet extends HttpServlet {
         Member loginUser = (Member) session.getAttribute("loginUser");
         String authorId = loginUser.getId();
 
-        // 🚀 [수정됨] MockDB 대신 CommentDAO를 통해 DB에 INSERT
         CommentDAO dao = new CommentDAO();
         // 0은 id 자리 (AUTO_INCREMENT이므로 0이나 임의의 값 넣음)
         boolean isSuccess = dao.insertComment(new Comment(0, boardId, authorId, content));
