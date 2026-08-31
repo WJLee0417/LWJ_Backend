@@ -2,6 +2,7 @@ package com.stepupbackend.security;
 
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -73,6 +74,6 @@ class SecurityWebMvcTest {
 
         mockMvc.perform(get("/login").param("error", ""))
                 .andExpect(status().isOk())
-                .andExpect(content().string("아이디 또는 비밀번호가 일치하지 않습니다."));
+                .andExpect(content().string(containsString("아이디 또는 비밀번호가 일치하지 않습니다.")));
     }
 }

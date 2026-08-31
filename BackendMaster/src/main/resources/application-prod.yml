@@ -1,0 +1,9 @@
+spring:
+  thymeleaf:
+    cache: true
+
+logging:
+  level:
+    root: warn
+    com.stepupbackend: info
+    org.flywaydb: warn

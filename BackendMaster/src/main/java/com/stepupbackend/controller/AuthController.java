@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import jakarta.validation.Valid;
 
 import com.stepupbackend.dto.member.MemberSignupRequest;
-import com.stepupbackend.exception.DuplicateMemberIdException;
 import com.stepupbackend.service.MemberService;
 
 @Controller
@@ -40,12 +39,7 @@ public class AuthController {
         if (bindingResult.hasErrors()) {
             return "auth/join";
         }
-        try {
-            memberService.register(request);
-            return "redirect:/login?registered";
-        } catch (DuplicateMemberIdException e) {
-            bindingResult.reject("signup.failed", "회원가입을 완료할 수 없습니다.");
-            return "auth/join";
-        }
+        memberService.register(request);
+        return "redirect:/login?registered";
     }
 }

@@ -1,6 +1,8 @@
 spring:
   application:
     name: step-up-backend
+  profiles:
+    default: dev
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
