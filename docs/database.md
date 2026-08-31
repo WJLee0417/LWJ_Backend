@@ -43,3 +43,9 @@ erDiagram
 `views DEFAULT 0`은 신규 게시글의 최초 조회수를 DB 수준에서 보장한다. 조회수 증가는 애플리케이션이 값을 읽어 다시 저장하지 않고 `UPDATE board_tbl SET views = views + 1`로 수행한다.
 
 초기 공지사항은 작성자 없이 삽입할 수 있도록 `board_tbl.author_id`가 nullable이다. 초기 관리자 계정은 SQL의 고정 해시가 아니라 애플리케이션 시작 시 환경변수 조건에 따라 생성된다.
+
+## 마이그레이션 정책
+
+스키마는 Flyway의 `db/migration/V1__create_initial_schema.sql`로 관리한다. 빈 Docker MySQL 같은 개발용 DB는 애플리케이션 시작 시 자동으로 마이그레이션하며, 기존 테이블을 삭제하지 않는다.
+
+운영 DB에는 `DROP TABLE`이나 자동 초기화를 사용하지 않는다. 새 변경은 다음 버전의 Flyway 마이그레이션으로 추가하고, 배포 전 백업과 적용 계획을 검토한다. 기존 직접 실행용 `init.sql`은 [레거시 SQL](../BackendMaster/src/legacy/sql/init.sql)로 보존한다.

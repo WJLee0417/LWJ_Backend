@@ -33,8 +33,11 @@ class BoardDAOIntegrationTest {
 
     @BeforeEach
     void resetDatabase() throws IOException, SQLException {
-        String sql = readInitSql();
+        String sql = readInitialMigration();
         try (Connection connection = DBUtil.getConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("DROP TABLE IF EXISTS comment_tbl");
+            statement.execute("DROP TABLE IF EXISTS board_tbl");
+            statement.execute("DROP TABLE IF EXISTS member_tbl");
             for (String command : sql.split(";")) {
                 if (!command.isBlank()) {
                     statement.execute(command);
@@ -67,10 +70,10 @@ class BoardDAOIntegrationTest {
         return value != null && !value.isBlank();
     }
 
-    private static String readInitSql() throws IOException {
-        try (InputStream inputStream = BoardDAOIntegrationTest.class.getResourceAsStream("/sql/init.sql")) {
+    private static String readInitialMigration() throws IOException {
+        try (InputStream inputStream = BoardDAOIntegrationTest.class.getResourceAsStream("/db/migration/V1__create_initial_schema.sql")) {
             if (inputStream == null) {
-                throw new IllegalStateException("init.sql resource was not found.");
+                throw new IllegalStateException("Initial schema migration was not found.");
             }
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
