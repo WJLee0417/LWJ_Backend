@@ -142,6 +142,13 @@ Copy-Item .\target\BackendMaster-0.0.1-SNAPSHOT.war "$env:CATALINA_BASE\webapps\
 
 자동화 테스트 우선순위와 격리 DB 실행 방식은 [테스트 가이드](docs/testing.md)에서 확인할 수 있습니다.
 
+## 설계와 개선 근거
+
+- [아키텍처](docs/architecture.md): 요청 흐름, Filter·Listener 책임, 공지와 일반글의 조회 전략
+- [데이터베이스 설계](docs/database.md): ERD, FK 정책, 조회수 기본값
+- [인증과 접근 제어](docs/authentication.md): BCrypt, 세션, 초기 관리자 생성 조건
+- [개선 이력](docs/troubleshooting.md): 보안·스키마·Java 버전 정합성 개선 과정
+
 ## 🔐 Security Notes
 
 - 비밀번호는 BCrypt 해시만 저장하며, 과거 해시 형식의 데이터는 인증되지 않습니다. BCrypt 전환 후에는 개발 DB를 새로 초기화해야 합니다.
