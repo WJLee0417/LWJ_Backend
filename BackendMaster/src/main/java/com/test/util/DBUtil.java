@@ -3,11 +3,12 @@ package com.test.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class DBUtil {
 
-    private static String getRequiredEnvironmentVariable(String name) {
-        String value = System.getenv(name);
+    private static String getRequiredEnvironmentVariable(Map<String, String> environment, String name) {
+        String value = environment.get(name);
         if (value == null || value.isBlank()) {
             throw new IllegalStateException("Missing required database environment variable: " + name);
         }
@@ -16,9 +17,13 @@ public class DBUtil {
 
     // Connection 객체를 반환하는 메서드
     public static Connection getConnection() {
-        String url = getRequiredEnvironmentVariable("DB_URL");
-        String user = getRequiredEnvironmentVariable("DB_USERNAME");
-        String password = getRequiredEnvironmentVariable("DB_PASSWORD");
+        return getConnection(System.getenv());
+    }
+
+    static Connection getConnection(Map<String, String> environment) {
+        String url = getRequiredEnvironmentVariable(environment, "DB_URL");
+        String user = getRequiredEnvironmentVariable(environment, "DB_USERNAME");
+        String password = getRequiredEnvironmentVariable(environment, "DB_PASSWORD");
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

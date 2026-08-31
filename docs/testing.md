@@ -1,6 +1,6 @@
 # 테스트 가이드
 
-현재 프로젝트에는 자동화 테스트 코드가 아직 없습니다. P2에서 아래 검증을 우선 구현합니다.
+JUnit 5 기반 단위 테스트와 Docker MySQL 8 기반 DAO 통합 테스트를 제공합니다.
 
 ## 우선 검증 대상
 
@@ -24,15 +24,23 @@ Java 17
 → 컨테이너와 테스트 데이터 제거
 ```
 
-P2에서는 JUnit 5를 추가하고, Docker 제어는 Testcontainers 또는 전용 테스트 스크립트 중 프로젝트 규모에 맞는 방식을 선택합니다.
+로컬 개발 DB와 데이터를 보호하기 위해 Testcontainers 대신 별도 Docker MySQL 8 컨테이너를 사용합니다. `BoardDAOIntegrationTest`는 세 DB 환경변수가 없으면 자동으로 건너뜁니다.
 
 ## 임시 수동 검증 명령
 
-자동화 테스트가 추가되기 전에는 다음 명령으로 Java 17 빌드를 검증합니다.
+DB 환경변수가 없는 경우에는 BCrypt와 DB 설정 단위 테스트만 실행됩니다.
 
 ```powershell
 cd BackendMaster
-mvn clean package
+mvn test
 ```
 
-통합 흐름은 Docker의 MySQL 8과 Tomcat 11을 사용해 회원가입, 로그인, 게시판 목록·상세·조회수를 확인합니다. 실제 개발 DB의 자격증명이나 데이터를 검증에 사용하지 않습니다.
+DAO 통합 테스트는 Docker MySQL 8 컨테이너에 `init.sql`을 적용한 뒤 아래 환경변수를 주입해 실행합니다.
+
+```text
+DB_URL=jdbc:mysql://localhost:3306/backend_master?serverTimezone=Asia/Seoul
+DB_USERNAME=app_user
+DB_PASSWORD=app_password
+```
+
+통합 테스트는 매 실행 전 테이블을 초기화하므로, 실제 개발 DB의 자격증명이나 데이터를 사용하면 안 됩니다.
