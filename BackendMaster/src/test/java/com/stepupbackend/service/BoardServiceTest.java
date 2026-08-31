@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
@@ -52,6 +53,23 @@ class BoardServiceTest {
                 () -> boardService.getBoardPage(new BoardSearchRequest("전체", "unknown", "keyword", 0, 10)));
         assertThrows(InvalidBoardSearchException.class,
                 () -> boardService.getBoardPage(new BoardSearchRequest("전체", "title", "keyword", 0, 51)));
+    }
+
+    @Test
+    void passesRequestedPageAndPageSizeToRegularBoardQuery() {
+        Member author = new Member("writer", "hash", "Writer", null);
+        when(boardRepository.findByCategoryOrderByIdDesc("공지")).thenReturn(List.of());
+        when(boardRepository.findRegularBoards(eq("공지"), eq("자유"), eq("title"), eq("keyword"), any()))
+                .thenReturn(new PageImpl<>(List.of(new Board("자유", "title", "content", author)), PageRequest.of(2, 5), 16));
+
+        BoardPageResponse result = boardService.getBoardPage(new BoardSearchRequest("자유", "title", "keyword", 2, 5));
+
+        ArgumentCaptor<org.springframework.data.domain.Pageable> pageable = ArgumentCaptor.forClass(org.springframework.data.domain.Pageable.class);
+        verify(boardRepository).findRegularBoards(eq("공지"), eq("자유"), eq("title"), eq("keyword"), pageable.capture());
+        assertEquals(2, pageable.getValue().getPageNumber());
+        assertEquals(5, pageable.getValue().getPageSize());
+        assertEquals(2, result.page());
+        assertEquals(4, result.totalPages());
     }
 
     @Test

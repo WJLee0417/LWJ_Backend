@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,18 @@ class RepositoryIntegrationTest {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private EntityManager entityManager;
+
     @Test
-    void repositoriesPersistAndQueryMemberBoardAndComment() {
+    void persistsSearchesAndCascadesBoardCommentsInMySql() {
         Member member = memberRepository.save(new Member("repository-user", "$2a$12$repositoryTestHash", "Repository User", "backend"));
         Board board = boardRepository.save(new Board("자유", "repository test board", "repository test content", member));
-        commentRepository.save(new Comment(board, member, "repository test comment"));
+        Comment comment = commentRepository.save(new Comment(board, member, "repository test comment"));
+        boardRepository.flush();
+        entityManager.clear();
+
+        board = boardRepository.findById(board.getId()).orElseThrow();
 
         assertEquals(2, boardRepository.findByCategoryOrderByIdDesc("공지").size());
 
@@ -47,5 +55,14 @@ class RepositoryIntegrationTest {
         List<Comment> comments = commentRepository.findByBoardIdOrderByIdAsc(board.getId());
         assertEquals(1, comments.size());
         assertTrue(memberRepository.findById("repository-user").isPresent());
+
+        board.incrementViews();
+        boardRepository.flush();
+        assertEquals(1, boardRepository.findById(board.getId()).orElseThrow().getViews());
+
+        entityManager.clear();
+        boardRepository.deleteById(board.getId());
+        boardRepository.flush();
+        assertTrue(commentRepository.findById(comment.getId()).isEmpty());
     }
 }
