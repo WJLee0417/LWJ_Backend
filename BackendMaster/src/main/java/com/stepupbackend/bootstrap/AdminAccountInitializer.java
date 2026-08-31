@@ -3,23 +3,25 @@ package com.stepupbackend.bootstrap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import com.stepupbackend.domain.Member;
+import com.stepupbackend.repository.MemberRepository;
 
 /** Creates the local initial administrator only when explicitly configured. */
 @Component
 public class AdminAccountInitializer implements ApplicationRunner {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final String initialPassword;
 
     public AdminAccountInitializer(
-            JdbcTemplate jdbcTemplate,
+            MemberRepository memberRepository,
             PasswordEncoder passwordEncoder,
             @Value("${app.bootstrap.admin-initial-password:}") String initialPassword) {
-        this.jdbcTemplate = jdbcTemplate;
+        this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.initialPassword = initialPassword;
     }
@@ -30,15 +32,12 @@ public class AdminAccountInitializer implements ApplicationRunner {
             return;
         }
 
-        Integer memberCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM member_tbl WHERE id = ?", Integer.class, "admin");
-        if (memberCount != null && memberCount == 0) {
-            jdbcTemplate.update(
-                    "INSERT INTO member_tbl (id, pw, name, part) VALUES (?, ?, ?, ?)",
+        if (!memberRepository.existsById("admin")) {
+            memberRepository.save(new Member(
                     "admin",
                     passwordEncoder.encode(initialPassword),
                     "마스터관리자",
-                    "시스템관리");
+                    "시스템관리"));
         }
     }
 }
