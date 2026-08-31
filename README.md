@@ -139,6 +139,8 @@ Copy-Item .\target\BackendMaster-0.0.1-SNAPSHOT.war "$env:CATALINA_BASE\webapps\
 - MySQL 8
 - Docker 기반 격리 환경에서 `mvn clean package`, WAR 배포, 회원가입·로그인·게시판 접근 검증 완료
 
+자동화 테스트 우선순위와 격리 DB 실행 방식은 [테스트 가이드](docs/testing.md)에서 확인할 수 있습니다.
+
 ## 🔐 Security Notes
 
 - 비밀번호는 BCrypt 해시만 저장하며, 과거 해시 형식의 데이터는 인증되지 않습니다. BCrypt 전환 후에는 개발 DB를 새로 초기화해야 합니다.
