@@ -87,6 +87,10 @@ StepUpBackend (Maven Project)
 
 ## 🚦 시작하기 (Installation)
 
+### 프로젝트 경로
+
+저장소 루트는 `LWJ_Backend`이고, Maven 모듈은 그 아래 `BackendMaster`입니다. 아래 Maven 명령은 반드시 `BackendMaster` 디렉터리에서 실행합니다.
+
 ### 요구 사항
 
 - JDK 17
@@ -96,7 +100,7 @@ StepUpBackend (Maven Project)
 
 ### 1. 데이터베이스 초기화
 
-MySQL에서 `backend_master` 스키마를 생성한 뒤 [init.sql](BackendMaster/src/main/resources/sql/init.sql)을 실행합니다. 이 스크립트는 개발용 DB를 새로 구성하므로, 기존 개발 데이터가 있다면 백업 후 실행합니다.
+MySQL에서 `backend_master` 스키마를 생성한 뒤 [init.sql](BackendMaster/src/main/resources/sql/init.sql)을 실행합니다. 이 스크립트에는 기존 테이블을 제거하는 `DROP TABLE` 문이 포함되어 있으므로, 기존 개발 데이터가 있다면 반드시 백업 후 실행합니다.
 
 ### 2. DB 환경변수 설정
 
@@ -116,9 +120,24 @@ cd BackendMaster
 mvn clean package
 ```
 
-생성된 `target/BackendMaster-0.0.1-SNAPSHOT.war` 파일을 Tomcat 11의 `webapps`에 배포한 뒤 서버를 시작합니다. 브라우저에서 `http://localhost:8080/`에 접속하고, 인증된 게시판은 `BoardListServlet`을 통해 확인할 수 있습니다.
+생성된 `target/BackendMaster-0.0.1-SNAPSHOT.war` 파일을 Tomcat 11의 `webapps` 디렉터리에 `ROOT.war` 이름으로 배포한 뒤 서버를 시작합니다.
+
+```powershell
+Copy-Item .\target\BackendMaster-0.0.1-SNAPSHOT.war "$env:CATALINA_BASE\webapps\ROOT.war"
+```
+
+브라우저에서 `http://localhost:8080/`에 접속합니다. 로그인 후 인증된 게시판은 `http://localhost:8080/BoardListServlet`에서 확인할 수 있습니다.
 
 빈 개발 DB에서 `ADMIN_INITIAL_PASSWORD`를 설정한 상태로 애플리케이션을 시작하면 `AppInitListener`가 `admin` 계정을 생성합니다. 초기 비밀번호는 환경변수로만 제공하며, 공개 배포 환경에서는 별도 계정 관리 정책을 적용해야 합니다.
+
+관리자 초기화를 사용하지 않는 경우에는 `join.jsp`에서 일반 회원을 가입한 뒤, 해당 계정으로 `login.jsp`에 로그인할 수 있습니다.
+
+### 검증한 실행 환경
+
+- Java 17
+- Apache Tomcat 11
+- MySQL 8
+- Docker 기반 격리 환경에서 `mvn clean package`, WAR 배포, 회원가입·로그인·게시판 접근 검증 완료
 
 ## 🔐 Security Notes
 
