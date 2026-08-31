@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: step-up-backend
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  thymeleaf:
+    cache: false
+
+server:
+  port: ${SERVER_PORT:8080}
