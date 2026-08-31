@@ -23,6 +23,7 @@ CREATE TABLE board_tbl (
     title VARCHAR(200) NOT NULL,
     content TEXT NOT NULL,
     author_id VARCHAR(50),
+    views INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES member_tbl(id) ON DELETE SET NULL
 );
