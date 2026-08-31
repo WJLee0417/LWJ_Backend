@@ -4,6 +4,10 @@
     <artifactId>BackendMaster</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     
     <build>
         <plugins>
@@ -11,7 +15,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>25</release>
+                    <release>17</release>
                 </configuration>
             </plugin>
             <plugin>

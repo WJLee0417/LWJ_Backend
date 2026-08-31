@@ -20,6 +20,11 @@ public class Board {
         this.createdAt = createdAt;
     }
 
+    // Deprecated MockDB 호환용 생성자
+    public Board(int id, String category, String title, String content, String authorId) {
+        this(id, category, title, content, authorId, 0, null);
+    }
+
     // Getter & Setter 추가
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
