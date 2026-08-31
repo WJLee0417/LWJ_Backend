@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 | Step-up Backend</title>
+</head>
+<body>
+    <main>
+        <h1>회원가입</h1>
+        <p th:if="${#fields.hasGlobalErrors()}" th:errors="*{global}">회원가입을 완료할 수 없습니다.</p>
+        <form th:action="@{/join}" th:object="${signup}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label>아이디 <input type="text" th:field="*{id}" autocomplete="username" required></label>
+            <label>비밀번호 <input type="password" th:field="*{password}" autocomplete="new-password" required></label>
+            <label>이름 <input type="text" th:field="*{name}" required></label>
+            <label>분야 <input type="text" th:field="*{part}"></label>
+            <button type="submit">가입</button>
+        </form>
+        <a th:href="@{/login}">로그인</a>
+    </main>
+</body>
+</html>

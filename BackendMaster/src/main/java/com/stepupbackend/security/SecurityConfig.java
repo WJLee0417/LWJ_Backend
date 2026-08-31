@@ -2,32 +2,60 @@ package com.stepupbackend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 @Configuration
 public class SecurityConfig {
 
-    /**
-     * Keeps the migration landing page reachable until member authentication is
-     * migrated to Spring Security in the next implementation stage.
-     */
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            DaoAuthenticationProvider authenticationProvider) throws Exception {
+        http
+                .authenticationProvider(authenticationProvider)
+                .csrf(Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/", "/login", "/join", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/join").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/boards/new", "/boards/*/edit").authenticated()
+                        .requestMatchers(HttpMethod.POST,
+                                "/boards",
+                                "/boards/*",
+                                "/boards/*/delete",
+                                "/boards/*/comments",
+                                "/comments/*/delete")
+                        .authenticated()
+                        .anyRequest().permitAll())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .usernameParameter("id")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/boards", true)
+                        .failureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error"))
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true));
         return http.build();
     }
 
-    /** Prevents Spring Security from creating and logging a temporary default user. */
     @Bean
-    UserDetailsService migrationUserDetailsService() {
-        return username -> {
-            throw new UsernameNotFoundException("Member authentication has not been migrated yet.");
-        };
+    DaoAuthenticationProvider authenticationProvider(
+            MemberUserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
     }
 
     @Bean
