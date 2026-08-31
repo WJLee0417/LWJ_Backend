@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인 | Step-up Backend</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-    <main>
+    <main class="container narrow">
         <h1>로그인</h1>
         <p th:if="${param.registered}">회원가입이 완료되었습니다. 로그인해 주세요.</p>
-        <p th:if="${param.error}">아이디 또는 비밀번호가 일치하지 않습니다.</p>
-        <form th:action="@{/login}" method="post">
+        <p class="error" th:if="${param.error}">아이디 또는 비밀번호가 일치하지 않습니다.</p>
+        <form class="card form-card" th:action="@{/login}" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <label>아이디 <input type="text" name="id" autocomplete="username" required></label>
-            <label>비밀번호 <input type="password" name="password" autocomplete="current-password" required></label>
+            <div class="field"><label for="id">아이디</label><input id="id" type="text" name="id" autocomplete="username" required></div>
+            <div class="field"><label for="password">비밀번호</label><input id="password" type="password" name="password" autocomplete="current-password" required></div>
             <button type="submit">로그인</button>
         </form>
-        <a th:href="@{/join}">회원가입</a>
+        <p class="text-link"><a th:href="@{/join}">회원가입</a></p>
     </main>
 </body>
 </html>

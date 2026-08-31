@@ -1,5 +1,7 @@
 package com.stepupbackend.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,12 +42,21 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long commentId, String requesterId) {
+    public Long deleteComment(Long commentId, String requesterId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment", commentId));
         if (requesterId == null || requesterId.isBlank() || !comment.isWrittenBy(requesterId)) {
             throw new UnauthorizedActionException("delete this comment");
         }
+        Long boardId = comment.getBoard().getId();
         commentRepository.delete(comment);
+        return boardId;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentResponse> getComments(Long boardId) {
+        return commentRepository.findByBoardIdOrderByIdAsc(boardId).stream()
+                .map(CommentResponse::from)
+                .toList();
     }
 }

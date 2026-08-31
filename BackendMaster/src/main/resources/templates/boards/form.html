@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <title th:text="${formTitle} + ' | Step-up Backend'">게시글 작성</title>
+</head>
+<body>
+    <main class="container">
+        <h1 th:text="${formTitle}">게시글 작성</h1>
+        <form th:action="${formAction}" th:object="${boardForm}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <div class="field">
+                <label for="category">카테고리</label>
+                <select id="category" th:field="*{category}">
+                    <option value="공지">공지</option><option value="학습">학습</option><option value="자유">자유</option>
+                </select>
+                <p class="error" th:errors="*{category}">오류</p>
+            </div>
+            <div class="field"><label for="title">제목</label><input id="title" th:field="*{title}" required><p class="error" th:errors="*{title}">오류</p></div>
+            <div class="field"><label for="content">내용</label><textarea id="content" th:field="*{content}" required></textarea><p class="error" th:errors="*{content}">오류</p></div>
+            <div class="actions"><a th:href="@{/boards}" class="button secondary">취소</a><button type="submit">저장</button></div>
+        </form>
+    </main>
+</body>
+</html>

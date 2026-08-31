@@ -4,20 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입 | Step-up Backend</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-    <main>
+    <main class="container narrow">
         <h1>회원가입</h1>
-        <p th:if="${#fields.hasGlobalErrors()}" th:errors="*{global}">회원가입을 완료할 수 없습니다.</p>
-        <form th:action="@{/join}" th:object="${signup}" method="post">
+        <form class="card form-card" th:action="@{/join}" th:object="${signup}" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <label>아이디 <input type="text" th:field="*{id}" autocomplete="username" required></label>
-            <label>비밀번호 <input type="password" th:field="*{password}" autocomplete="new-password" required></label>
-            <label>이름 <input type="text" th:field="*{name}" required></label>
-            <label>분야 <input type="text" th:field="*{part}"></label>
+            <p class="error" th:if="${#fields.hasGlobalErrors()}" th:errors="*{global}">회원가입을 완료할 수 없습니다.</p>
+            <div class="field"><label for="id">아이디</label><input id="id" type="text" th:field="*{id}" autocomplete="username" required><p class="error" th:errors="*{id}">오류</p></div>
+            <div class="field"><label for="password">비밀번호</label><input id="password" type="password" th:field="*{password}" autocomplete="new-password" required><p class="error" th:errors="*{password}">오류</p></div>
+            <div class="field"><label for="name">이름</label><input id="name" type="text" th:field="*{name}" required><p class="error" th:errors="*{name}">오류</p></div>
+            <div class="field"><label for="part">분야</label><input id="part" type="text" th:field="*{part}"></div>
             <button type="submit">가입</button>
         </form>
-        <a th:href="@{/login}">로그인</a>
+        <p class="text-link"><a th:href="@{/login}">로그인</a></p>
     </main>
 </body>
 </html>

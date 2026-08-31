@@ -24,14 +24,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/login", "/join", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/join").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/boards/new", "/boards/*/edit").authenticated()
-                        .requestMatchers(HttpMethod.POST,
-                                "/boards",
-                                "/boards/*",
-                                "/boards/*/delete",
-                                "/boards/*/comments",
-                                "/comments/*/delete")
-                        .authenticated()
+                        .requestMatchers("/boards/**", "/comments/**").authenticated()
                         .anyRequest().permitAll())
                 .formLogin(form -> form
                         .loginPage("/login")

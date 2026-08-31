@@ -70,6 +70,13 @@ public class BoardService {
         return BoardDetailResponse.from(board);
     }
 
+    @Transactional(readOnly = true)
+    public BoardDetailResponse getBoardForEdit(Long boardId, String requesterId) {
+        Board board = getBoard(boardId);
+        requireBoardAuthor(board, requesterId, "edit this board");
+        return BoardDetailResponse.from(board);
+    }
+
     @Transactional
     public BoardDetailResponse createBoard(String authorId, BoardCreateRequest request) {
         Member author = memberRepository.findById(authorId)
