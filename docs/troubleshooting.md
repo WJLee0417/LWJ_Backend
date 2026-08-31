@@ -1,31 +1,24 @@
-# 개선 이력과 문제 해결
+# 전환 결정과 개선 이력
 
-## SHA-256에서 BCrypt로 전환
+## Servlet/JSP·JDBC에서 Spring Boot로 전환한 이유
 
-기존 SHA-256 방식은 비밀번호 전용 salt와 비용 조절이 없어 현대적인 비밀번호 저장 정책에 부적합했다. `PasswordUtil`을 BCrypt 기반의 `hashPassword`와 `matches`로 분리하고, 회원가입은 해시 저장·로그인은 비교 검증을 수행하도록 변경했다.
+기존 구현은 학습 목적의 Servlet/JSP와 JDBC/DAO 구조였습니다. Spring Boot 전환에서는 내장 서버 실행, Spring MVC의 검증·예외 처리, Spring Security 인증, JPA Repository, Flyway 마이그레이션을 통해 실행과 검증 경로를 단순화했습니다. 레거시 구현은 Git 이력과 `src/legacy`에 남겨 전환 전후 규칙을 비교할 수 있게 했습니다.
 
-두 방식의 해시는 호환되지 않으므로 기존 개발 데이터는 마이그레이션하지 않았다. 대신 개발용 DB를 `init.sql`로 재생성하고, 초기 관리자는 `ADMIN_INITIAL_PASSWORD` 조건에서 새 BCrypt 해시로 생성하도록 정리했다.
+## JPA를 선택한 이유
 
-## DB 자격증명 외부화
+`Member`·`Board`·`Comment`의 연관 관계와 페이징 조회를 Entity·Repository로 표현해 반복적인 ResultSet 매핑과 연결 관리를 줄였습니다. Service는 트랜잭션과 도메인 규칙에 집중합니다. 스키마 변경은 JPA 자동 생성 대신 Flyway로 관리해 변경 이력을 명시합니다.
 
-JDBC URL, 사용자명, 비밀번호가 소스에 고정돼 있던 문제를 `DBUtil`의 환경변수 입력으로 전환했다.
+## 세션 인증을 유지한 이유
 
-| 환경변수 | 용도 |
-| --- | --- |
-| `DB_URL` | MySQL JDBC URL |
-| `DB_USERNAME` | DB 사용자명 |
-| `DB_PASSWORD` | DB 비밀번호 |
+Thymeleaf 서버 렌더링 폼은 HTTP 세션과 CSRF 방어에 자연스럽게 맞습니다. 따라서 현재는 form login·세션을 사용합니다. REST API/SPA/모바일 클라이언트가 분리되면 API DTO와 토큰 인증(JWT 또는 OAuth2)을 추가하는 지점이 명확합니다.
 
-필수 값이 없으면 변수명만 포함한 오류를 내고, JDBC 연결 실패도 접속 값 없이 일반화된 메시지로 처리한다. `.env.example`은 공개 가능한 예시만 제공하며 실제 `.env`는 Git에서 제외한다.
+## 보안·스키마 개선
 
-## `views` 스키마와 DAO의 불일치
+- SHA-256 대신 BCrypt와 `PasswordEncoder`를 사용해 비밀번호를 저장합니다.
+- DB URL·계정·비밀번호는 환경변수로만 받습니다.
+- `views DEFAULT 0`과 게시글 삭제 댓글 cascade를 Flyway 스키마와 MySQL 통합 테스트로 보장합니다.
+- `GlobalExceptionHandler`와 요청 로그는 사용자 메시지와 내부 원인을 분리하며 민감값을 출력하지 않습니다.
 
-게시글 DAO가 `views`를 조회·증가시키는데 초기 스키마에 해당 열이 없으면 깨끗한 DB에서 게시판 SQL이 실패한다. `board_tbl`에 `views INT NOT NULL DEFAULT 0`을 추가해 신규 게시글의 초기값을 보장했고, 통합 테스트로 `0 → 1` 증가를 확인한다.
+## 한계와 다음 개선 방향
 
-## Java 릴리스 버전 불일치
-
-README의 Java 17 안내와 Maven Compiler의 이전 `release 25` 설정이 서로 맞지 않아 JDK 17 빌드가 보장되지 않았다. `pom.xml`의 컴파일 `release`를 17로 통일했고, Java 17 Maven 컨테이너에서 `mvn clean package`와 테스트를 검증했다.
-
-## 오류 로그의 민감정보 노출 방지
-
-DAO에서 JDBC 예외 전체를 출력하던 처리를 작업명만 남기는 로그로 바꿨다. 따라서 오류가 발생해도 DB URL, 사용자명, 비밀번호가 콘솔 출력에 포함되지 않는다.
+현재는 학습용 단일 애플리케이션입니다. 운영 수준으로 발전시키려면 프로필별 secret 관리, 구조화 로그·메트릭·알림, 파일 업로드 보안, 비밀번호 재설정, OAuth2, API 버전 관리, 배포 파이프라인을 추가해야 합니다.

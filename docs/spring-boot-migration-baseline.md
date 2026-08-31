@@ -1,5 +1,7 @@
 # Spring Boot 전환 기준선
 
+> 이 문서는 전환 **전** Servlet/JSP 구현의 기능 계약과 검증 기록을 보존하는 아카이브입니다. 현재 실행 방법과 구조는 [README](../README.md), [아키텍처](architecture.md), [테스트 가이드](testing.md)를 기준으로 합니다.
+
 이 문서는 Servlet/JSP 구현을 Spring Boot로 전환할 때 유지하거나 의도적으로 보완해야 할 기능 계약을 고정한다. 기준 리비전은 `main`과 동일한 `13c206dc104d91f24f2868926b4712acf256701e`이며, 전환 작업은 `spring-boot-migration` 브랜치에서 시작했다.
 
 ## 검증 기록

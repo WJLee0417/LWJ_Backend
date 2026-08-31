@@ -5,36 +5,31 @@
 ```mermaid
 sequenceDiagram
     participant U as Browser
-    participant J as JoinServlet
-    participant L as LoginServlet
-    participant P as PasswordUtil
-    participant M as MemberDAO / MySQL
-    U->>J: 회원가입 요청 (평문 비밀번호)
-    J->>P: hashPassword(plainText)
-    P-->>J: BCrypt hash (cost 12, 새 salt)
-    J->>M: member_tbl에 hash 저장
-
-    U->>L: ID·평문 비밀번호 전송
-    L->>M: ID로 저장 해시 조회
-    M-->>L: Member
-    L->>P: matches(plainText, hashedPassword)
-    P-->>L: 일치 여부
-    L-->>U: 성공 시 loginUser 세션 생성
+    participant C as AuthController
+    participant M as MemberService
+    participant E as PasswordEncoder
+    participant DB as MySQL
+    U->>C: 회원가입 폼 전송
+    C->>M: register(request)
+    M->>E: encode(plain password)
+    M->>DB: BCrypt hash 저장
+    U->>C: POST /login
+    C->>E: Spring Security authenticate
+    E-->>U: SecurityContext와 HTTP 세션 생성
 ```
 
-`PasswordUtil.hashPassword`는 매 호출마다 새 salt를 포함한 BCrypt 해시를 생성한다. 따라서 같은 비밀번호도 해시 문자열은 달라질 수 있다. 로그인은 평문을 다시 해시해 비교하지 않고 `PasswordUtil.matches(plainText, hashedPassword)`로 검증한다. 손상됐거나 형식이 맞지 않는 해시는 인증 실패로 처리한다.
+회원가입은 `MemberService`가 Spring Security `PasswordEncoder`로 입력 비밀번호를 BCrypt 해시로 바꾼 뒤 저장합니다. 로그인은 `DaoAuthenticationProvider`와 `MemberUserDetailsService`가 저장된 해시를 사용해 `matches()` 방식으로 검증합니다. 계정 존재 여부나 비밀번호 값은 실패 메시지와 로그에 노출하지 않습니다.
 
-## 세션 기반 보호
+## 세션·CSRF·권한
 
-로그인에 성공하면 `LoginServlet`이 `loginUser`를 HTTP 세션에 저장한다. `LoginCheckFilter`는 게시글 화면과 주요 게시글 Servlet의 보호 경로에서 이 세션 값을 확인한다. 세션이 없으면 로그인 화면으로 리다이렉트하며, 로그인·회원가입 경로는 인증 없이 접근할 수 있다.
+- 공개 경로: 홈, 로그인, 회원가입, 정적 리소스
+- 인증 경로: `/boards/**`, `/comments/**`
+- 로그인 성공 사용자 정보는 SecurityContext와 HTTP 세션에 유지됩니다.
+- 폼의 상태 변경 요청은 CSRF 토큰을 포함해야 합니다.
+- 게시글·댓글 수정과 삭제는 Service가 작성자 ID를 다시 확인합니다. 화면의 버튼 숨김은 편의 기능일 뿐 권한 보장의 유일한 수단이 아닙니다.
 
-게시글 수정·삭제처럼 작성자 권한이 필요한 작업은 해당 Servlet과 JSP가 세션의 사용자 ID와 작성자 ID를 비교해 제어한다.
+세션 인증은 서버 렌더링 애플리케이션에서 쿠키·CSRF와 결합하기 간결해 현재 유지합니다. 외부 SPA·모바일 클라이언트가 주된 소비자가 되면 API 경계에 JWT 또는 OAuth2 토큰 인증을 도입할 수 있습니다.
 
-## 초기 관리자 계정
+## 초기 관리자
 
-`AppInitListener`는 서버 시작 시 다음 조건을 모두 만족할 때만 `admin` 계정을 만든다.
-
-1. `member_tbl`에 `admin`이 아직 없다.
-2. `ADMIN_INITIAL_PASSWORD` 환경변수가 비어 있지 않다.
-
-이 값은 BCrypt 해시로 변환된 뒤에만 DB에 저장된다. 환경변수가 없으면 초기 계정 생성을 건너뛰며, 비밀번호나 DB 접속 값은 로그에 기록하지 않는다.
+`ADMIN_INITIAL_PASSWORD`가 비어 있지 않고 `admin` 계정이 없을 때만 `AdminAccountInitializer`가 초기 계정을 생성합니다. 평문 비밀번호는 저장하거나 로그에 남기지 않습니다.

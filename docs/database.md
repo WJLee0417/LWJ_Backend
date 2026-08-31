@@ -1,6 +1,6 @@
-# 데이터베이스 설계
+# 데이터베이스 설계와 마이그레이션
 
-초기화 스크립트는 [init.sql](../BackendMaster/src/main/resources/sql/init.sql)에 있다. 개발 환경에서 실행하면 기존 테이블을 삭제하고 다시 만들므로, 운영 데이터나 보존할 개발 데이터에 실행해서는 안 된다.
+스키마는 Flyway의 [V1 마이그레이션](../BackendMaster/src/main/resources/db/migration/V1__create_initial_schema.sql)으로 관리합니다. 빈 MySQL에 애플리케이션을 시작하면 Flyway가 한 번 적용합니다. 운영 DB에는 직접 `DROP TABLE`을 실행하지 않고 다음 버전의 마이그레이션을 추가합니다.
 
 ```mermaid
 erDiagram
@@ -26,26 +26,17 @@ erDiagram
         text content
         timestamp created_at
     }
-
     member_tbl o|--o{ board_tbl : "author_id / SET NULL"
     member_tbl o|--o{ comment_tbl : "author_id / SET NULL"
     board_tbl ||--o{ comment_tbl : "board_id / CASCADE"
 ```
 
-## 테이블과 제약 조건
+| 테이블 | 핵심 규칙 |
+| --- | --- |
+| `member_tbl` | `id`가 PK이며 `pw`에는 BCrypt 해시만 저장한다. |
+| `board_tbl` | `views INT NOT NULL DEFAULT 0`으로 새 게시글의 초기 조회수를 보장한다. 회원 삭제 시 작성자 FK는 `NULL`이 된다. |
+| `comment_tbl` | 게시글 FK는 `ON DELETE CASCADE`다. 회원 삭제 시 작성자 FK는 `NULL`이 된다. |
 
-| 테이블 | 역할 | 핵심 제약 |
-| --- | --- | --- |
-| `member_tbl` | 회원 계정과 BCrypt 비밀번호 해시를 저장한다. | `id`는 PK, `pw`는 `VARCHAR(255) NOT NULL`이다. |
-| `board_tbl` | 게시글과 조회수를 저장한다. | `author_id`는 회원 삭제 시 `NULL`로 남아 게시글을 보존한다. `views`는 `INT NOT NULL DEFAULT 0`이다. |
-| `comment_tbl` | 게시글별 댓글을 저장한다. | `board_id`는 게시글 삭제 시 `ON DELETE CASCADE`로 함께 삭제된다. 작성자 회원이 삭제되면 `author_id`만 `NULL`이 된다. |
+JPA Entity의 관계는 DB FK 정책과 맞춘다. 특히 `Board` 삭제 시 JPA `CascadeType.REMOVE`와 MySQL `ON DELETE CASCADE`가 모두 댓글 정리를 보장합니다. Repository 통합 테스트가 실제 MySQL에서 이 동작과 조회수 증가를 검증합니다.
 
-`views DEFAULT 0`은 신규 게시글의 최초 조회수를 DB 수준에서 보장한다. 조회수 증가는 애플리케이션이 값을 읽어 다시 저장하지 않고 `UPDATE board_tbl SET views = views + 1`로 수행한다.
-
-초기 공지사항은 작성자 없이 삽입할 수 있도록 `board_tbl.author_id`가 nullable이다. 초기 관리자 계정은 SQL의 고정 해시가 아니라 애플리케이션 시작 시 환경변수 조건에 따라 생성된다.
-
-## 마이그레이션 정책
-
-스키마는 Flyway의 `db/migration/V1__create_initial_schema.sql`로 관리한다. 빈 Docker MySQL 같은 개발용 DB는 애플리케이션 시작 시 자동으로 마이그레이션하며, 기존 테이블을 삭제하지 않는다.
-
-운영 DB에는 `DROP TABLE`이나 자동 초기화를 사용하지 않는다. 새 변경은 다음 버전의 Flyway 마이그레이션으로 추가하고, 배포 전 백업과 적용 계획을 검토한다. 기존 직접 실행용 `init.sql`은 [레거시 SQL](../BackendMaster/src/legacy/sql/init.sql)로 보존한다.
+레거시 직접 실행 SQL은 `BackendMaster/src/legacy/sql`에 보존하며 현재 실행 경로에서 사용하지 않습니다.

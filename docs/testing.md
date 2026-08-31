@@ -1,59 +1,44 @@
 # 테스트 가이드
 
-JUnit 5 기반 단위 테스트와 Docker MySQL 8 기반 DAO 통합 테스트를 구현했다. 테스트 클래스는 `BackendMaster/src/test/java`에 있다.
+테스트는 단위, Web, MySQL Repository 통합, Docker E2E 네 단계로 구성합니다.
 
-## 우선 검증 대상
+| 구분 | 주요 검증 |
+| --- | --- |
+| 단위 테스트 | BCrypt 해시·검증, 회원가입 해시 저장, 공지/일반글 분리, 검색·페이지 계산, 조회수 규칙, 댓글 권한 |
+| Web 테스트 | 미인증 보호 URL의 로그인 이동, CSRF, 인증 사용자 작성, 타인 수정·삭제 거부, 공통 오류 화면 |
+| Repository 통합 | Flyway가 구성한 MySQL에서 검색, `views` 기본값·증가, FK와 게시글 삭제 댓글 cascade |
+| E2E | 회원가입 → 로그인 → 게시글 작성 → 댓글 작성·삭제 → 게시글 삭제 |
 
-| 대상 | 검증 내용 | 완료 조건 |
-| --- | --- | --- |
-| `PasswordUtil` | BCrypt 해시 생성, 올바른 비밀번호 일치, 틀린 비밀번호 불일치 | 동일 평문은 서로 다른 salt 해시를 만들고, `matches`가 올바른 입력만 통과시킨다. |
-| `DBUtil` | `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` 누락 | 누락된 변수명만 포함한 안전한 오류가 발생하고, 비밀번호는 출력하지 않는다. |
-| `BoardDAOIntegrationTest` | 공지 분리, 목록·제목 검색·페이징, 신규 글 조회수, 조회수 증가 | `init.sql`을 적용한 격리 DB에서 공지 2건, 신규 글 `views=0`, 증가 후 `views=1` 및 기본 목록 동작을 확인한다. |
-
-## 실행 환경
-
-DB가 필요한 테스트는 로컬 개발 DB가 아닌 격리된 MySQL 8 컨테이너에서 실행합니다.
-
-```text
-Java 17
-→ Maven test
-→ Docker MySQL 8 컨테이너 생성
-→ init.sql 적용
-→ DB_URL / DB_USERNAME / DB_PASSWORD 주입
-→ 테스트 실행
-→ 컨테이너와 테스트 데이터 제거
-```
-
-로컬 개발 DB와 데이터를 보호하기 위해 Testcontainers 대신 별도 Docker MySQL 8 컨테이너를 사용합니다. `BoardDAOIntegrationTest`는 세 DB 환경변수가 없으면 자동으로 건너뜁니다.
-
-## 실행 명령
-
-DB 환경변수가 없는 경우 `BoardDAOIntegrationTest`는 자동으로 건너뛰고 BCrypt·DB 설정 단위 테스트만 실행한다.
+## 기본 실행
 
 ```powershell
 cd BackendMaster
 mvn test
 ```
 
-DAO 통합 테스트는 Docker MySQL 8 컨테이너에 `init.sql`을 적용한 뒤 아래 환경변수를 주입해 실행한다.
+`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`가 없으면 `RepositoryIntegrationTest`는 자동으로 건너뜁니다. 단위·Web 테스트는 DB 없이 실행됩니다.
 
-```text
-DB_URL=jdbc:mysql://localhost:3306/backend_master?serverTimezone=Asia/Seoul
-DB_USERNAME=app_user
-DB_PASSWORD=app_password
-```
+## MySQL 통합 테스트
+
+로컬 개발 DB 대신 격리된 Docker MySQL을 사용합니다.
 
 ```powershell
-$env:DB_URL = "jdbc:mysql://localhost:3306/backend_master?serverTimezone=Asia/Seoul"
+docker run -d --rm --name step-up-test-db -p 3311:3306 `
+  -e MYSQL_DATABASE=backend_master `
+  -e MYSQL_USER=app_user `
+  -e MYSQL_PASSWORD=app_password `
+  -e MYSQL_ROOT_PASSWORD=root_password mysql:8.4
+
+$env:DB_URL = "jdbc:mysql://localhost:3311/backend_master"
 $env:DB_USERNAME = "app_user"
 $env:DB_PASSWORD = "app_password"
-mvn test
+cd BackendMaster
+mvn -Dtest=RepositoryIntegrationTest test
+docker rm -f step-up-test-db
 ```
 
-통합 테스트는 매 실행 전 테이블을 초기화하므로 실제 개발 DB의 자격증명이나 데이터를 사용하면 안 된다.
+Flyway가 빈 DB에 스키마를 적용하며 테스트 트랜잭션은 롤백됩니다. 통합 테스트는 2026-09-01 Docker MySQL 8에서 통과했습니다.
 
-## 검증 결과
+## E2E 검증 기록
 
-- Java 17 Maven 컨테이너에서 `mvn test` 통과
-- MySQL 8 격리 컨테이너에서 `BoardDAOIntegrationTest` 통과
-- 위 통합 테스트는 2026-08-31에 실행했으며, 테스트용 컨테이너는 검증 후 제거했다.
+Docker MySQL 8과 Spring Boot 실행 JAR에서 회원가입, 로그인, 게시글 작성, 댓글 작성·삭제, 게시글 삭제를 검증했습니다. 삭제 후 `board_tbl`과 `comment_tbl`에서 해당 E2E 레코드가 모두 0건임을 확인했습니다.

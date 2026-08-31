@@ -1,36 +1,34 @@
 # 아키텍처
 
-이 프로젝트는 JSP/Servlet 기반 MVC 구조에서 컨트롤러와 데이터 접근 책임을 분리한다. 브라우저 요청은 Filter를 거쳐 Servlet에 도달하고, Servlet은 DAO를 통해서만 MySQL에 접근한다. JDBC 연결 정보는 `DBUtil`이 환경변수에서 읽는다.
+현재 실행 경로는 Spring Boot의 계층형 MVC 구조입니다. 레거시 Servlet/JSP·JDBC 구현은 `BackendMaster/src/legacy`에 보존되어 있으며 실행 JAR에는 포함되지 않습니다.
 
 ```mermaid
 flowchart LR
-    Browser[Browser] --> Encoding[EncodingFilter\nUTF-8 인코딩]
-    Encoding --> Auth[LoginCheckFilter\n보호 경로 세션 확인]
-    Auth --> Controller[Servlet\n요청 처리·화면 전환]
-    Controller --> DAO[DAO\nSQL 실행]
-    DAO --> DBUtil[DBUtil\n환경변수 검증·JDBC 연결]
-    DBUtil --> MySQL[(MySQL 8)]
-    Controller --> JSP[JSP\n화면 렌더링]
-    Listener[AppInitListener\n애플리케이션 시작] --> DAO
+    Browser --> Security[Spring Security\nform login · session · CSRF]
+    Security --> Controller[Controller\nHTTP · View model]
+    Controller --> Service[Service\nPolicy · Authorization · Transaction]
+    Service --> Repository[Repository\nSpring Data JPA]
+    Repository --> MySQL[(MySQL 8)]
+    Controller --> Thymeleaf[Thymeleaf templates]
+    Flyway[Flyway migration] --> MySQL
 ```
 
-## 책임 분리
+## 계층별 책임
 
-| 구성 요소 | 책임 |
+| 계층 | 책임 |
 | --- | --- |
-| `EncodingFilter` | 모든 요청과 응답의 UTF-8 인코딩을 적용한다. |
-| `LoginCheckFilter` | `board.jsp`, 게시글 목록·작성·삭제 요청 등 설정된 보호 경로에서 `loginUser` 세션 유무를 확인하고, 미인증 요청을 로그인 화면으로 보낸다. |
-| Servlet | HTTP 파라미터와 세션을 해석하고, DAO 호출 결과를 JSP에 전달하거나 다음 화면으로 이동시킨다. |
-| DAO | SQL과 ResultSet 매핑을 담당한다. Servlet은 JDBC API를 직접 사용하지 않는다. |
-| `DBUtil` | `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`를 검증하고 JDBC 연결을 생성한다. 실패 메시지에는 접속 값이나 비밀번호를 포함하지 않는다. |
-| `AppInitListener` | 서버 시작 시 `admin` 계정이 없고 `ADMIN_INITIAL_PASSWORD`가 설정된 경우에만 BCrypt 해시를 만들어 초기 계정을 생성한다. |
+| `security` | SecurityContext·세션, 보호 URL, CSRF를 처리한다. |
+| `controller` | HTTP 파라미터·검증 오류를 다루고 Thymeleaf 모델 또는 redirect를 결정한다. |
+| `service` | 회원가입, 공지/일반글 분리, 검색 검증, 조회수, 작성자 권한과 트랜잭션을 처리한다. |
+| `repository` | JPA Entity 조회·저장과 게시글 검색·페이징 쿼리를 수행한다. |
+| `domain` | `Member`, `Board`, `Comment` 관계와 값 변경 규칙을 표현한다. |
+| `bootstrap` | 환경변수가 있을 때만 초기 관리자 계정을 생성한다. |
+| `exception` | 사용자 메시지와 서버 안전 로그를 분리한다. |
 
-## 게시판 조회 흐름
+## 게시글과 관측성
 
-`BoardListServlet`은 공지와 일반글을 의도적으로 두 번 조회한다. 공지는 페이지와 무관하게 상단에 고정하고, 일반글만 카테고리·검색 조건과 `LIMIT` 기반 페이징에 포함한다. `getBoardList`와 `getTotalBoardCount`는 같은 필터 조건을 사용하므로 페이지 수와 목록 범위가 일치한다.
+`BoardController`는 공지와 일반글을 별도 모델 값으로 전달합니다. `BoardService`는 공지(`공지`)를 별도 조회하고 일반글만 검색·페이지 조건에 넣습니다. 상세 조회는 작성자 본인 외 사용자에게만 `views`를 증가시키며, 수정·삭제는 Service에서 작성자 ID를 다시 확인합니다.
 
-상세 요청에서는 `BoardDetailServlet`이 게시글을 먼저 조회한다. 로그인한 사용자가 작성자가 아닐 때만 `BoardDAO.incrementViewCount`가 `views = views + 1` SQL을 실행하며, 응답에 쓰는 DTO의 표시값도 함께 갱신한다.
+`RequestTimingInterceptor`는 메서드, 경로, 상태 코드, 처리 시간만 기록합니다. `GlobalExceptionHandler`는 입력 오류, 권한 오류, 리소스 없음, DB 장애를 공통 오류 화면으로 변환합니다. DB URL, JDBC 사용자명, 비밀번호, BCrypt 해시는 로그에 남기지 않습니다.
 
-## 레거시 경계
-
-`com.test.db.MockDB`는 MySQL 전환 전의 학습 과정을 보여 주기 위한 Deprecated 클래스다. 현재 Servlet, DAO, `DBUtil`로 구성된 실행 경로에서는 참조하거나 사용하지 않는다.
+개발·운영 프로필은 `application-dev.yml`, `application-prod.yml`에서 템플릿 캐시와 로그 레벨을 분리합니다.
